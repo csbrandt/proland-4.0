@@ -1,0 +1,88 @@
+/*! \mainpage notitle
+
+\htmlonly
+<div class="mainpage">
+<br/><h1>Proland Documentation - Ocean Plugin</h1>
+\endhtmlonly
+
+The ocean plugin provides two tasks to draw an animated ocean. The
+first one synthesizes the ocean surface with a sum of trochoids, while
+the second one uses a Fast Fourier Transform (FFT). Both tasks can either
+draw a flat ocean or a spherical one. Both tasks also provide to ocean
+shaders the necessary data to compute ocean lighting as described in 
+"Real-time Realistic Ocean Lighting using Seamless Transitions from 
+Geometry to BRDF", Eric Bruneton and Fabrice Neyret, Eurographics 2010.
+The "ocean1" and "ocean2" examples illustrate how these two tasks can
+be used. <i>This plugin does not depend on any other plugin</i>.
+
+At each frame, the proland::DrawOceanTask does the following:
+<ul>
+<li>update the uniforms in the associated ocean shader related to the
+current camera position (i.e. matrices to transform between the "ocean frame"
+described below, the world frame, the camera frame and the screen frame).</li>
+<li>update the uniforms describing the horizon curve equation y=f(x) - 
+see below.</li>
+<li>update the uniform in the associated ocean shader related to the
+current time.</li>
+<li>update the grid used to draw the ocean in screen space, if the viewport
+as changed since the last frame.</li>
+<li>draw this grid with the ocean shader, which is then responsible for
+most of the work (discarding triangles above the horizon, displacing the
+remaining vertices based on the current time and waves data, and shading
+the ocean fragments).
+</ul>
+
+The proland::DrawOceanFFTTask is very similar:
+<ul>
+<li>update the uniforms in the associated ocean shader related to the
+current camera position (i.e. matrices to transform between the "ocean frame"
+described below, the world frame, the camera frame and the screen frame).</li>
+<li>update the uniforms describing the horizon curve equation y=f(x) - 
+see below.</li>
+<li>perform a FFT to update the textures representing the ocean's height.
+This FFT is performed with shaders on GPU (the shaders for doing that
+are provided in the "ocean2" example).</li>
+<li>update the grid used to draw the ocean in screen space, if the viewport
+as changed since the last frame.</li>
+<li>draw this grid with the ocean shader, which is then responsible for
+most of the work (discarding triangles above the horizon, displacing the
+remaining vertices based on the current time and waves data, and shading
+the ocean fragments).
+</ul>
+
+The "ocean frame" is a local reference frame in which all displacement 
+and shading computations are done. The origin of this frame is the
+vertical projection of the camera on the ocean's surface. Its z axis
+is the vertical, and its xy plane corresponds to the ocean surface
+at rest. For a spherical ocean, this xy plane corresponds to the
+tangent plane to the sphere at the radial projection of the camera on
+the sphere.
+
+The ocean frame is thus a frame which is moving with the camera. Of 
+course the ocean surface is not moving with the camera, so we cannot
+directly use this frame to evaluate the ocean surface. Instead we
+use a (dx,dy) offset, relatively to the origin of the ocean frame. That is,
+to evalute the ocean surface at a point p=(x,y) in ocean frame, we
+evaluate the ocean height function at (x-dx,y-dy). Initially this offset
+is set to 0. It is then updated at each frame, to compensate for the
+camera moves (see below). It is reset to 0 each time the camera goes
+above the altitude at which the ocean is no longer displayed (we do
+this to ensure that the offset is small, in order to avoid numerical
+precision problem. Note that
+we change the offset only when the ocean is not displayed, so no 
+popping can be seen due to this sudden change).
+
+The offset is updated at each frame as follows: if P(f) is the matrix
+transforming world coordinates into ocean frame coordinates at frame
+f, then the offset O(f)=(dx,dy) at frame f+1 is set to 
+O(f+1)=O(f)+P(f+1)P<sup>-1</sup>(f)[0 0 0 1]<sup>T</sup>
+
+The horizon is managed differently in Proland than in the source code
+provided with the above paper: instead of computing at each
+frame a grid covering only the ocean, the proland::DrawOceanTask
+draws an immutable grid covering the whole screen. However, the vertex 
+shader moves the vertices above the horizon curve on this curve, based
+on the equation of this curve, whose coefficients are computed on CPU
+and passed in the "horizon1" and "horizon2" uniforms.
+
+*/

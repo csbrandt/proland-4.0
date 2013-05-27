@@ -1,0 +1,61 @@
+<multithreadScheduler name="defaultScheduler" nthreads="3" fps="0"/>
+
+<tileCache name="dzCache" scheduler="defaultScheduler">
+	<cpuFloatTileStorage tileSize="197" channels="1" capacity="1024"/>
+</tileCache>
+<residualProducer name="dz" cache="dzCache" file="DEM.dat"/>
+
+<tileCache name="zCache" scheduler="defaultScheduler">
+	<gpuTileStorage tileSize="29" nTiles="1600"
+		internalformat="RGBA32F" format="RGBA" type="FLOAT"
+		min="NEAREST" mag="NEAREST"/>
+</tileCache>
+<elevationProducer name="z" cache="zCache" residuals="dzCache"/>
+
+<tileCache name="nCache" scheduler="defaultScheduler">
+	<gpuTileStorage tileSize="25" nTiles="1600"
+		internalformat="RGBA32F" format="RGBA" type="FLOAT"
+		min="NEAREST" mag="NEAREST"/>
+</tileCache>
+<normalProducer name="n" cache="nCache" elevations="z"/>
+
+<tileCache name="rgbCpuCache" scheduler="defaultScheduler">
+	<cpuByteTileStorage tileSize="196" channels="3" capacity="1024"/>
+</tileCache>
+<orthoCpuProducer name="rgbCpu" cache="rgbCpuCache" file="ORTHO.dat"/>
+
+<tileCache name="rgbGpuCache" scheduler="defaultScheduler">
+	<gpuTileStorage tileSize="196" nTiles="400"
+		internalformat="RGB8" format="RGB" type="UNSIGNED_BYTE"
+		min="LINEAR_MIPMAP_LINEAR" mag="LINEAR" minLOD="0" maxLOD="1"/>
+</tileCache>
+<orthoGpuProducer name="rgbGpu" cache="rgbGpuCache" ortho="rgbCpu"/>
+
+<terrainNode name="myTerrain" size="50000" zmin="0" zmax="5000"
+    splitFactor="2" maxLevel="16"/>
+
+<node name="myTerrainNode" flags="object,dynamic">
+	<bounds xmin="-50000" ymin="-50000" zmin="0"
+	    xmax="50000" ymax="50000" zmax="5000"/>
+	<field id="terrain" value="myTerrain"/>
+	<tileSamplerZ id="z" sampler="zSampler" producer="z"
+	    storeInvisible="false"/>
+	<tileSampler id="n" sampler="nSampler" producer="n"
+	    storeInvisible="false"/>
+	<tileSampler id="rgb" sampler="rgbSampler" producer="rgb"
+	    storeParent="false" storeInvisible="false"/>
+	<mesh id="grid" value="grid25.mesh"/>
+	<method id="update" value="updateTerrainMethod"/>
+	<method id="draw" value="drawTerrainMethod"/>
+	<shader id="material" value="terrainShader"/>
+</node>
+
+<node name="myScene">
+	<node flags="camera">
+		<uniformMatrix4f id="cameraToScreen" name="cameraToScreen"/>
+		<shader id="material" value="cameraShader"/>
+		<method id="draw" value="cameraMethod"/>
+	</node>
+
+	<node name="terrain" value="myTerrainNode"/>
+</node>

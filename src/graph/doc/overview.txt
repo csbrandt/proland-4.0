@@ -1,0 +1,1079 @@
+/*! \mainpage notitle
+
+\htmlonly
+<div class="mainpage">
+<br/><h1>Proland Documentation - Graph Plugin</h1>
+\endhtmlonly
+
+\section sec-intro Introduction
+
+The Proland graph plugin provides some producers dedicated to the
+production of vector data, and to the rasterization of vector data
+into raster tiles. <i>This plugin depends on the terrain plugin</i>.
+
+\subsection sec-graph Graph producer
+
+A <b>graph</b> contains 2D vector data made of points, curves, and
+areas. Vector data can be used to represent linear terrain features
+such as roads and rivers, as well as areal features such as foret
+areas, city areas, etc. It can be used to draw these features on top
+of an orthophoto, to modify terrain elevations in order to correctly
+insert these features into the terrain, to drive the procedural
+generation of objects on top of the terrain (such as planting trees
+along roads), etc. The main advantage of vector data is that it is
+resolution independant, unlike raster data. Hence you can get very
+precise linear features at all scales with very few data.
+
+In Proland, Graphs are mainly used in
+\link proland::GraphLayer GraphLayers\endlink, which can draw
+data on any producer based on the content of a graph. See Ortho
+\ref sec-orthogpulayers or Elevations \ref sec-elevationlayers.
+
+More precisely a graph is made of <i>nodes</i>, <i>curves</i> and
+<i>areas</i>:
+
+\htmlonly
+<center>
+<embed src="graphs.svg" width="80%" type="image/svg+xml"/><br/>
+<div class="caption">A graph is made of nodes, curves and
+areas.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graphs.svg
+\htmlonly --> \endhtmlonly
+
+- a node is simply a 2D point.
+- a curve joins a start node to an end node through some vertices.
+- an area is a set of curves that form a loop oriented in 
+counter-clockwise order. An area can contain recursively another graph,
+called a subgraph.
+
+A graph is called that way because it stores the connectivity
+between these elements. A node stores the set of curves that are
+connected to it (in the above example, both N1 and N2 have
+references to C1, C2 and C3). A curve has references to the two
+nodes at its extremities, as well as references to the areas that
+contain this curve (at most two, one on each side of the curve - for
+instance C2 has references to A1 and A2, while C3 only has a
+reference to A1). Finally an area is simply a list of curve
+references, together with their orientations.
+
+A node is only defined by two (x,y) coordinates. A curve is defined
+by its start and end node and by its vertices. It also has a type
+and a width, which can be interpreted as you want, depending on your
+needs. The vertices can be <i>regular</i> or <i>control</i>
+vertices. A curve made only of regular vertices gives a polyline
+(this is the case of C2 in the above example). But you can also
+insert one or two (at most) control vertices between two regular
+vertices, which then define a smooth quadratic or cubic Bezier patch
+between these two regular vertices (for instance C3 in the above
+example is made of a quadratic and a cubic Bezier patch). Note that
+regular vertices are on the curve, while control vertices are not
+(they define tangent vectors at the regular vertices). The polyline
+joining the vertices (the dashed line in the above example) is
+called the control curve of the curve.
+
+A graph can be <b>edited</b> in arbitrary ways by adding and
+removing nodes, vertices, curves or areas, moving nodes or vertices,
+etc.
+
+A graph can also be <b>clipped</b> to a specified rectangular area
+by removing the graph elements that fall outside this clipping area.
+Here the "elements" are the linear, quadratic or cubic Bezier
+patches of the curves. This means that a curve can be clipped only
+at the regular vertices between these patches (i.e., we do not
+compute the exact intersections of a curve with the clip area, to
+improve performance). A clipped curve can result in several
+disconnected smaller curves. One the contrary a clipped area result
+in at most one area (by construction). In order to get closed areas
+we sometime need to introduce new straight line curves to close
+clipped areas:
+
+\htmlonly
+<center>
+<embed src="graph-clip.svg" width="80%" type="image/svg+xml"/><br/>
+<div class="caption">Once clipped, the closed curve forming a loop
+on the left gives new nodes (N2 and N3) and two clipped curves (in
+blue and green on the right). Note that the curve is not clipped at
+the exact intersections with the clipping area, but only at regular
+vertices. In order to close the clipped area a new straight line
+curve is added between N2 and N3. In practice the clipping is done
+in two steps, first by an horizontal slab, then by a vertical one,
+in order to avoid problems at corners when closing clipped areas
+with straight lines.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-clip.svg
+\htmlonly --> \endhtmlonly
+
+In order to take curve widths into account during clipping, the clip
+area can be automatically enlarged with a <b>margin</b> to avoid
+clipping curves whose axis is outside the clip region, but not their
+borders:
+
+\htmlonly
+<center>
+<embed src="graph-margin.svg" width="80%" type="image/svg+xml"/>
+<br/>
+<div class="caption">Margins avoid clipping curves whose axis is
+outside the clip region, but not their borders. Without margins
+(left) the curve is discarded, which is incorrect. With a margin
+equal to half the curve width, the curve is not discarded
+(right).</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-margin.svg
+\htmlonly --> \endhtmlonly
+
+Finally a graph can also be <b>flattened</b> by introducing new
+vertices in curves so that their control curve converge toward the
+smooth curves themselves. This is used to draw the control polylines
+instead of the curves themselves, which is simpler. The result is
+the same if the control polylines are close enough to the smooth
+curves. The new vertices are computed by using the recursive Bezier
+curve subdivision algorithm, until the maximal distance between the
+curve and its control curve is less than a specified threshold:
+
+\htmlonly
+<center>
+<embed src="graph-flatten.svg" width="80%" type="image/svg+xml"/>
+<br/>
+<div class="caption">A graph is flattened by replacing the curve
+vertices with new vertices computed from the old ones, and so on
+recursively, until the distance between the control curve (dash
+line) and the real curve (plain line) is below some specified
+threshold.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-flatten.svg
+\htmlonly --> \endhtmlonly
+
+During this process we compute a <b>pseudo curvilinear
+coordinate</b>, noted <i>s</i>, for each vertex along curves.
+Initially this pseudo coordinate is the vertex index in the curve.
+During flattening, fractional coordinates are computed for the new
+vertices with the same formulas as for the vertices themselves.
+These pseudo coordinates allow us to quickly find the <b>real
+curvilinear coordinate</b> along a curve (noted <i>l</i>), only when
+needed and even if it is not flattened enough (with the help of an
+auxilliary curve "fully" flattened, and by using a dichotomic
+search):
+
+\htmlonly
+<center>
+<embed src="graph-curvilinear.svg" width="80%"
+type="image/svg+xml"/><br/>
+<div class="caption">The pseudo curvilinear coordinate s is used to
+quickly compute the real curvilinear coordinate l. Note that s has
+nothing to do with the real length along the curve.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-curvilinear.svg
+\htmlonly --> \endhtmlonly
+
+When a graph is modified by <i>editing</i>, <i>clipping</i> or 
+<i>flattening</i> the changes made to the graph are notified to the
+<b>listeners</b> of this graph. These changes are described as a set of
+removed curves and areas, and a set of newly added curves and areas.
+In other words a modified curve, for instance, is described as the
+removal of an old curve and the addition of a new one. These changes
+can be exploited by incremental versions of the clipping and
+flattening operations. The <b>incremental clipping</b> operation
+takes as input a source graph, the same graph clipped to some
+region, and some changes made to the source graph. It produces as
+output an updated clipped graph and the changes made to this clipped
+graph. It does this without clipping again the whole source graph.
+Instead it uses the source changes to recompute only the changed
+elements in the clipped graph. The <b>incremental flattening</b>
+operation works in a similar manner.
+
+A <b>graph producer</b> is a producer that produces graph tiles for
+each quad of a quadtree. The produced graph for each quad contains
+only the vector data that intersect this quad (taking margins into
+account), flattened with the appropriate threshold so that the
+curves can be drawn in associated raster tiles with good precision.
+The graph for the root quad is "produced" by simply loading a graph
+from disk. The graph for any other quad is produced by 
+<i>clipping</i> the graph of the parent quad, and by <i>flattening</i>
+the result with half the threshold used for the parent graph.
+
+\note It is also possible to precompute and store on disk the
+clipped graphs for a given quadtree level L. In this case no graph
+will be produced for levels between 0 and L-1. Graphs at level L are
+then "produced" by loading them from disk. Graphs at level more than
+L are produced by clipping and flattening from their parent graph,
+as before. This option can be useful for very large graphs.
+
+\note We say that the graph of the parent quad is the <b>parent
+graph</b> of the four clipped graphs of the child quads. A graph has
+a reference to its parent graph, if there is one (i.e. if this graph
+was produced by clipping from another graph). Likewise a curve has a
+reference to its <b>parent curve</b>, if it was produced by clipping
+from another curve, and an area has a reference to its <b>parent
+area</b>, if it was produced by clipping from another area. The 
+<b>ancestor</b> of a graph, curve or area is the parent of the parent of
+... the parent of the element, which has no parent itself.
+
+A graph producer is a listener of its root graph. It is then
+notified of any change made to this root graph, for instance via the
+graphical user interface provided by the
+proland::EditGraphOrthoLayer (see \ref sec-orthogpulayers
+"Predefined Ortho GPU producer layers"). When changes are detected
+the graphs for the quads other than the root are recomputed
+incrementally, from top to bottom, by using the incremental clip and
+flatten operations. This recursive descent stops when the new
+changes returned by these operations become empty. See below for
+more details.
+
+\subsubsection sec-graphclasses Graph classes
+
+The concepts above are implemented by the classes in the
+\ref graph module. A graph is an instance of
+proland::Graph. This class defines all the functions that can
+be performed on graphs, such as loading and saving them to disk,
+accessing their nodes, curves and areas, moving, adding and removing
+nodes, curves and areas, clipping and flattening graphs incrementally
+or not, etc. It also manages the graph listeners, notifying them of
+any change. This class can be used anywhere you need to manipulate
+graphs, <i>except</i> when you need to instantiate a graph. Indeed
+this class is abstract. You can only instantiate one of its two
+concrete subclasses, proland::BasicGraph and
+proland::LazyGraph. The first one keeps the whole graph in
+memory at all times, until the graph is deleted. The second one loads
+the graph elements from disk only when needed (i.e., <i>lazily</i>),
+and deletes them from memory when they are no longer used. It can be
+used for very large graphs that exceed the CPU memory capacity.
+
+The proland::Node class represents a node. It stores the (x,y)
+coordinates of the node, the references to the curves connected to
+this node, and a reference to the graph to which it belongs, called
+its <i>owner</i>.
+
+The proland::Curve class represents a curve. It stores
+references to the start and end nodes of the curve (and their pseudo
+and real curvilinear coordinates s and l), the vertices of the curve
+(with x,y,s and l coordinates for each vertex, plus a boolean to
+distinguish regular and control vertices), the curve type and width,
+the references to the areas on each side of the curve (if any), a
+reference to the parent curve (if any), and a reference to the owner
+graph.
+
+Finally the proland::Area represents an area. It stores the
+references to the curves that form this area with, for each curve,
+its orientation (a boolean indicating if the curve must be followed
+from its start node to the end node, or the reverse - these oriented
+curves must form a closed loop in counter-clockwise order). It also
+stores a reference to the parent area (if any), and a reference to
+the owner graph.
+
+A proland::BasicGraph uses smart pointers to reference its
+nodes, curves and areas. Hence these elements cannot be deleted until
+the graph object itself is deleted, even if the nodes, curves and
+areas are no longer referenced themselves (other than by the graph -
+recall that smart pointers can be seen as "strong pointers",
+preventing the target from being deleted before the source;
+conversely normal pointers can be seen as "weak pointers", where the
+target can be deleted at any moment). The curves and areas also use
+smart pointers, to reference their parent elements. However, since
+smart pointers must not form loops, the nodes, curves and areas use
+normal pointers to reference their owner graph:
+
+\htmlonly
+<center>
+<embed src="basicgraph.svg" width="60%" type="image/svg+xml"/><br/>
+<div class="caption">A BasicGraph uses smart pointers to reference
+its elements, which themselves use normal back pointers (to avoid
+circular references).</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html basicgraph.svg
+\htmlonly --> \endhtmlonly
+
+A proland::LazyGraph uses normal pointers to reference its
+elements. However these normal pointers are only used internally.
+Externally, smart pointers are used. As a consequence, when an
+element returned to a "client" becomes no longer referenced by any
+smart pointer, this element is deleted (by the
+ork::Object::doRelease method). In fact it is not, because this
+doRelease method is overriden in the proland::LazyNode,
+proland::LazyCurve and proland::LazyArea subclasses of
+the above classes. This overriden method puts these unreferenced
+elements in a cache (whose size is specified by the user in
+proland::LazyGraph). If these elements are needed again a few
+seconds later, they will be reused from the cache instead of being
+reconstructed. Hence the cache prevents elements from being deleted
+and recreated permanently.
+
+\htmlonly
+<center>
+<embed src="lazygraph.svg" width="64%" type="image/svg+xml"/><br/>
+<div class="caption">Internally, a LazyGraph uses normal pointers to
+reference its elements. Externally it uses smart pointers. Hence
+elements can be deleted when then are no longer referenced.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html lazygraph.svg
+\htmlonly --> \endhtmlonly
+
+In fact each reference in a proland::LazyGraph is made of an
+identifier and a normal pointer. The identifier indicates, via an
+index map stored in the graph file, where the identified element is
+stored on disk. The pointer is NULL if the referenced element has not
+been loaded yet in memory, or if it is no longer in memory. In this
+case, if the element is requested, the identifier is used to load it
+from disk and to create its memory representation. These identifiers
+can also be used by clients to designate graph elements when they
+only need to identify them, without using them. In order to unify
+identifiers for basic and lazy graphs (for basic graphs an
+"identifier" is simply a pointer to the identified element), the
+proland::NodeId, proland::CurveId, and
+proland::AreaId types are unions that can contain either an
+integer or a pointer.
+
+\note A lazy graph handles added, modified and deleted elements in a
+special way, in order to avoid reloading an outdated version of these
+elements from the disk. Indeed a lazy graph references added and
+modified elements with smart pointers, so that they cannot be deleted
+before the graph itself. Deleted elements are removed from the index
+map used to load elements from their identifiers, and so cannot be
+reloaded from disk inadvertently.
+
+The listeners of a graph are added and removed with the
+proland::Graph::addListener and
+proland::Graph::removeListener method. Each listemer must
+implement the proland::GraphListener abstract class which
+contains a single method. When changes occur in the graph, they are
+stored in the proland::Graph::changes field, of type
+proland::Graph::Changes, and then the listeners are notified.
+Note that the previous value of the \link proland::Graph::changes changes\endlink 
+field is lost. Hence
+listeners must be careful to read its value before it is overriden
+due to new changes. The number of changes that occured to a graph is
+stored in the proland::Graph::version field. This integer is
+initially 0, and is incremented after each change, before the
+listeners are notified.
+
+The margins used to clip a graph are specified with a
+proland::Margin object. The role of this class is to compute
+the margin to be used for each node, curve or area during clipping
+(each element can use a different margin). It is also possible to
+specify an additional margin computed from the clip area itself. This
+can be used to account for tile borders (see \ref sec-
+producerframework "Producer framework"). This class is abstract, i.e.
+you must override it to define how margins must be computed,
+depending on how you want to you the graphs.
+
+Graphs can be easily extended, in order to represent special kind
+of data (by adding specific parameters for Node/Curve/Area for example).
+Almost all Graph methods are virtual to enable this. The user-defined
+graph will need to re-implement the newNode/newCurve/newArea methods
+to create the proper Node/Curve/Area's extensions, as well as the
+createChild method to be sure that the new child Graph will be correct.
+The load and save functions should also be overriden in order to
+properly load the file.
+
+The user can then change the behavior of graph for almost everything
+he wants.
+
+\note In order to be reusable even for basic graphs, the graphs have
+a parameter count for each kind of parameter (number of curve
+parameters, node parameters...) that are written in their '.graph'
+file, and which are checked when loading the file:
+For example, let's say you have a Graph with a float value added
+in Curves. That value would just be ignored in BasicGraph and LazyGraph.
+\endnode
+
+
+\subsubsection sec-graphfiles Graph files
+
+Graphs can be stored on disk in four formats: basic ASCII, indexed
+ASCII, basic binary, indexed binary. The first byte of the file
+indicates the file format: 0 means basic binary, 1 means indexed
+binary, 48 (i.e., the <i>char</i> '0') means basic ASCII, and 49
+(i.e., the <i>char</i> '1') means indexed ASCII. The ASCII formats
+are easy to edit manually. The indexed formats contain a precomputed
+index map indicating the offset of each element in the file. They are
+faster to load than non indexed formats (non indexed files must be
+fully read in order to construct the index map at runtime).
+
+The next 7 parameters are used to determine if the graph in the file is
+compatible with the Graph in which we want to load it.
+Those parameters are:
+<ul>
+<li>Number of Node parameters: default is 2 (X, Y).</li>
+<li>Number of Curve parameters: default is 3 (Size, Width and Type).</li>
+<li>Number of Area parameters: default is 3 (Size, Info and subgraph boolean).</li>
+<li>Number of Curve Extremities parameters: default is 1 (Node number).</li>
+<li>Number of Curve Vertices parameters: default is 3 (X, Y, isControl).</li>
+<li>Number of Area's Curves parameters: default is 2 (Curve number, orientation).</li>
+<li>Number of Area's subgraphs parameters: default is 0.</li>
+</ul>
+
+After those data information bytes, non-indexed files must have the following
+format:
+- number of nodes (integer).
+- description of each node.
+- number of curves (integer).
+- description of each curve.
+- number of areas (integer).
+- description of each area.
+- description of each subgraph.
+
+Indexed files must have the following format:
+- offset of the index map in the file (long integer).
+- description of each node.
+- description of each curve.
+- description of each area.
+- index map.
+
+A node description has the following format:
+- x coordinate (float).
+- y coordinate (float).
+- number of curves connected to this node (integer).
+- for each connected curve:
+  - identifier of the curve (integer).
+
+A curve description has the following format:
+- number of vertices (including the start and end nodes - integer).
+- width (float).
+- type (integer).
+- identifier of the start node (integer).
+- for each vertex of the curve:
+  - x coordinate (float).
+  - y coordinate (float).
+  - isControl (boolean).
+- identifier of the end node (integer).
+- identifier of the "left" area (integer, -1 if none).
+- identifier of the "right" area (integer, -1 if none).
+- identifier of the ancestor curve in the root graph file - must be
+an indexed file (integer, -1 if none).
+
+An area description has the following format:
+- number of curves in this area (integer).
+- user data (integer).
+- a boolean set to true if the area has a subgraph (integer).
+- for each curve of the area:
+  - identifier ot the curve (integer).
+  - orientation of the curve in the area (integer).
+  - identifier of the ancestor area in the root graph file - must be
+  an indexed file (integer, -1 if none).
+
+A subgraph description has the same format has a non-indexed file
+(minus the first byte indicating the format). Subgraphs are always
+loaded with basic graphs, even if the graph itself is loaded with a
+lazy graph.
+
+The index map in indexed files must have the following format:
+- number of nodes (integer).
+- number of curves (integer).
+- number of areas (integer).
+- number of subgraphs (integer).
+- for each node, the offset of its description in the file (long
+integer).
+- for each curve, the offset of its description in the file (long
+integer).
+- for each area, the offset of its description in the file (long
+integer).
+- for each subgraph, the offset of its description in the file (long
+integer).
+
+The identifier of a node is simply its index in the list of nodes, in
+the order in which they appear in the file. Likewise for curves,
+areas and subgraphs.
+
+Here is an example of non-indexed ASCII file (the comments are <i>
+not</i> part of the file):
+
+\verbatim
+0 // Format: not indexed, ASCII
+2 3 3 1 3 2 0  // Number of parameters for each type: Nodes, curves, areas, 
+curve extremities, curve vertices, area curves and subgraphs parameters.
+5 // Number of nodes
+-10000.000 -10000.000 2 0 1 // 1st node description
+10000.000 10000.000 2 1 2 // 2nd node description
+10000.000 -10000.000 2 2 0 // 3rd node description
+150.000 13510.000 0 // 4th node description
+500.000 400.000 1 3 // 5th node description
+4 // Number of curves
+2 1.000 0 // 1st curve description
+0
+1
+0 -1 -1
+2 1.000 0 // 2nd curve description
+1
+2
+0 -1 -1
+25 1.000 0 // 3rd curve description
+2
+-5634.000 -1208.000 0 // 3rd curve's vertices
+[...]
+-5224.000 -1678.000 0
+-5244.000 -1698.000 0
+-5864.000 -1228.000 0
+0
+0 -1 -1
+4 1.000 0 // 4th curve description (a simple loop)
+4
+520.000 400.000 0
+500.000 420.000 0
+4
+1 -1 -1
+3 // Number of areas
+3 1 0 // 1st area description
+0 0
+1 0
+2 0
+-1
+1 1 1 // 2nd area description. This one has a subgraph
+3 0
+-1
+// Begining of the subgraph descriptions
+1 // Number of nodes
+515.000 405.000 1 0 // 1st node description
+1 // Number of curves
+3 2.000 0 // 1st curve description
+0
+516.000 408.000 0
+0
+0 -1 -1
+1 // Number of areas
+0 1 // ?
+-1 // ?
+\endverbatim
+
+\note .graph files do NOT support comments.
+
+\subsubsection sec-graphedition Graph Edition
+
+Graphs are designed to be editable. For that purpose, the
+proland::Graph class provides every function necessary to update
+their content, and to maintain the stability of the system, independently
+from the Graph type (They might have to be redefined if the Graph is
+extended and if you add special links between Nodes/Curves/Areas).
+
+Each time you add/remove a node or a curve, the Graph must be changed to
+maintain a consistency (i.e. if a curve clips an area, it makes two areas,
+and if a curve from an area is deleted, that area should be deleted too,
+but if the curve had two areas, they must be rebuilt).
+
+To avoid taking too much time by browsing the entire Graph, the add and
+remove methods are smart and browse only the linked curves and areas to
+detect what must be done. It checks if there are loops where you
+added/removed a curve, and rebuild only those areas. Since there are
+LOTS of special cases, this behavior is mandatory. It is the same when
+you remove a Node, it can either delete the curves around it, or merge
+them. If they are merged, they must be properly rebuilt and added to
+their area(s).
+
+Furthermore, for each editing function, Graphs are able to determine
+what has changed and to return it in a proland::Graph#Changes
+structure. If there are several changes in a row, they can be merged
+in order to not delete twice the same curve for example, or to avoid
+adding a curve and removing it right after. Those Changes structure
+are very usefull to  determine what should or shouldn't be updated
+in child graphs, especially for the proland::GraphProducer class.
+
+\htmlonly
+<center>
+<embed src="graph-addcurves.svg" type="image/svg+xml" width="64%" /><br/>
+<div class="caption">When adding a curve, the system checks if the curve
+creates a new area (1) or if it splits an existing area (2). If so, the
+Areas will be rebuilt by browsing through their linked curves. It is
+also able to determine that addings as (3) won't affect the areas, except
+for refreshing the curves when adding the node itself. The same check 
+operations must be performed when deleting a curve. Deleting Curve (1) 
+will only delete one area, but deleting Curve (2) will merge the two areas 
+around it. Finally, deleting curve 3 won't affect any curves, since it 
+shouldn't be part of any curve (it isn't part of a loop, and therefore 
+should be excluded from the area building process).</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-addcurves.svg
+\htmlonly --> \endhtmlonly
+
+\subsubsection sec-graphproducer GraphProducer class
+
+The proland::GraphProducer class is a producer that can load a
+precomputed Graph from the disk, and then subdivise it into subgraphs
+corresponding to each Tile displayed.
+It behaves as follow :
+
+For the root Tile, the producer simply loads the Graph from a file (See
+Load and save description and the \ref sec-graphfiles section). For every
+other tile, if not already stored in cache, the corresponding Graph is clipped from
+its parent Graph.
+
+
+
+Since GraphProducers are also GraphListeners, they are able to determine when 
+a Graph changed. When this happens, the GraphProducer invalidates its root Tile. 
+The root graph won't be recomputed, but will contain the changes of its last 
+modifications, and since every Graph depends on its parent Graph, the level 1 
+Graphs will have to be checked and updated if necessary. If there were any 
+changes in the operation, the sub-graphs of the level 1 Graph will be invalidated, 
+and the same process will happen to them. Graphs are only updated when they are 
+needed,  i.e. when the program calls the 
+\link  proland::GraphProducer#getTile GraphProducer#getTile\endlink 
+method. 
+
+This is where the smart-update mechanism starts:
+When computing a Graph for a given tile, the GraphProducer is able to determine 
+if the Graph was already in cache and invalidated. If its the case, then, 
+it needs to be checked. Otherwise, the graph will just be clipped (if not in cache) 
+or simply not updated (if in cache and still valid).
+
+Each Graph contains a version number, which enables the GraphProducer to determine 
+which Graphs are up-to-date and which are not. If the version of a Graph is the 
+same as its parent, then it is already up-to-date, and won't need to be updated. 
+If its children are up-to-date with it, they won't need an update either. If the 
+child's version is just the previous one of it's parent's version, we can apply 
+a clip update on the current tile. Otherwise, if the versions are too different,
+the Graph will have to be fully clipped again. When updated, each graph generates 
+a list of changes, used in the incremental update mechanism. This also helps to 
+determine if any modifications occured in the current Tile, and thus to determine 
+if its sub-tiles should be updated.
+
+
+The list of changes created by a Graph when it is updated contains the added and 
+removed curves and areas. This allows to only update those curves and areas during 
+clipUpdate. This is incremental, i.e. each time a Graph is updated, it checks its 
+parent's last list of changes and version, updates its own curves and areas (the 
+child curves and child areas of those from the list of changes, if any are found 
+in the current Graph), and its own list of changes. If no elements were updated, 
+then only the Graph version is updated, and the GraphProducer won't invalidate 
+the child tiles. Otherwise, children will be invalidated, and they will at their 
+turn use the previously computed version and list of changes.
+
+
+
+The user can decide whether or not the parent tiles of currently used
+tiles should be stored or not (Accelerates switching between levels,
+but uses more memory).
+
+
+\htmlonly
+<center>
+<embed src="graph-update.svg" type="image/svg+xml"/><br/>
+<div class="caption">Graph updates. Top images: edition at level n. The Graph 
+version will be incremented, and the Graph will contain its changes (one curve 
+added and a curve moved). At the bottom, what happens in the lower level: if 
+the version is different from the parent one, tiles are recomputed; left Tiles 
+are fully recomputed, while right tiles are only updated. The updated graphs 
+will all contain the changed data. Those who were fully recomputed don't need 
+to contain that data, because their children will be fully clipped too. The 
+change list indicated on the lower left tile is the one it would contain if 
+it had been only updated. The upper right tile doesn't have any changes because 
+it doesn't contain the changed part in its graph : Curve C1 is actually clipped 
+in smaller curves in the child tiles Only those corresponding to the changed part 
+are updated. Also note that a moved or edited curve (on curve C1, only the 
+status of the point changed) will have to be in the removed curves list, but 
+also in the added curves list, so it will be removed and re-added in the child 
+graph. </div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-update.svg
+\htmlonly --> \endhtmlonly
+
+A few options are then available :
+- Precomputed Graphs : The user can specify one or more precomputed levels, for
+which he can provide the corresponding Graphs. These Graphs must be stored
+in a sub-directory in the directory of the root Graph with the same name.
+Files should be named as follows :
+[graph_name]_[level]_[XCoord]_[YCoord].graph.
+Example : roads_03_00_00.graph would be the lower left Tile at level 3.
+If one or more of the files doesn't exist, the Producer will create them
+from the root Graph (when they are needed). Note that if the doFlatten
+option is set to true, these subgraphs will have to be flattened.
+Then, when needed, the proland::GraphProducer will load these files
+instead of clipping them from the root Graph. This options allows to avoid
+useless computations of undisplayed levels for example, and greatly
+improves loading speed.
+
+- \link proland::Margin Margins\endlink : Each class that will
+use the producer may need additional data from the neighbouring tiles
+(For example, to display a road that would go along a tile border, and
+would be cut if not taken into account).
+So, when created, these classes will have to add their margin into the
+GraphProducer via the
+\link proland::GraphProducer#addMargin() Margin()\endlink and
+\link proland::GraphProducer#removeMargin() removeMargin()\endlink
+methods. The largest will then be used.
+
+- \link proland::GraphListener GraphListeners\endlink : Since they
+use Graphs to generate other Graphs, GraphProducers must know when a Graph
+was edited. In that purpose, GraphProducer implements the
+proland::GraphListener#graphChanged() method : It invalidates the
+first tile, which will cause the changes to be propagated through child
+Graphs via the smart update mechanism : only required tiles will be
+updated (as described above). This method is called each time the Graph
+is edited.
+
+- \link proland::CurveData CurveDatas\endlink : GraphProducers
+also keep a cache of \link proland::CurveData CurveData\endlink
+objects. CurveData class contains informations about a given Curve, such
+as its length, type etc... For example, this is used in layers, to
+compute height, length, stripes... A Size can be assigned to that
+cache to avoid memory overloading.
+
+\subsubsection sec-graphproducerresource Graph Producer resource
+
+A proland::GraphProducer can be loaded with the Ork resource
+framework, using the following format (the "graph1" example
+illustrates how a GraphProducer can be used):
+
+\verbatim
+<graphProducer name="myGraphProducer" cache="graphCache"
+file="myGraphFile"
+    loadSubgraphs="true" doFlatten="true" precomputedLevel="3" precomputedLevels="3,1:5"
+    nodeCacheSize="0" curveCacheSize="100000" areaCacheSize="100000"
+    dataCacheSize="-1" storeParents="true"/>
+\endverbatim
+
+The graphs are produced in the tile cache resource specified by the
+<tt>cache</tt> attribute. This cache must have an associated 
+\link proland::ObjectTileStorage ObjectTileStorage\endlink. The
+root graph is loaded from the <i>file</i>.graph file, where 
+<i>file</i> is the value of the <tt>file</tt> parameter. If 
+<tt>precomputedLevel</tt> or <tt>precomputedLevels</tt> are set, the precomputed
+clipped graphs are loaded from the <i>file</i> directory. In this
+directory, each clipped graph file must be named 
+<i>file</i>_<i>level</i>_<i>tx</i>_<i>ty</i>.graph, where level, tx, ty are logical
+quad coordinates. If these precomputed files do not exist they are
+created at first use. The usage for precomputedLevels is that every level 
+must be separated by a coma (','). You can specify a range of levels by 
+placing a colon between the begin and end levels. <tt>precomputedLevel</tt> 
+only allows 1 specified precomputedLevel; It is mainly here for compatibility 
+with previous versions. The user can also specify whether to use the 
+\link proland::Graph#flatten() flatten\endlink 
+method after each \link proland::Graph#clip() clip\endlink. If you
+use existing precomputed clipped graphs, they must be consistent with
+that choice (i.e. they must be flattened if you selected <tt>
+doFlatten</tt>="true"). Finally, the user also has the option to store 
+the parent tiles of currently used tiles (<tt>storeParents</tt>). As 
+said before, this option allows to accelerate the switching between 
+levels but since they remain in the memory, a tile at an high level 
+will take a lot more memory.
+
+The LazyGraph cache size can also be set via the <tt>
+nodeCacheSize</tt> / <tt>curveCacheSize</tt> / <tt>areaCacheSize</tt>
+attributes. Finally, the maximum number of cached CurveData can also
+be set with <tt>dataCacheSize</tt>. 0 means no cache, -1 means an
+unbounded cache.
+
+\subsubsection sec-graphcurvedatas CurveDatas
+
+proland::CurveData class contains data about a
+\link proland::Curve Curve\endlink. A Curve and all its children
+share the same CurveData; This allows to maintain consistency between the
+different levels of detail.
+
+It Stores a flattened version of the root Curve, created by the
+GraphProducer that generated that root Curve. Basically, it contains
+general information about that curve: Start and End Cap lengths,
+boundaries, curvilinear length and pseudo curvilinear coordinates,
+and any other data you might want to add. All these datas are computed 
+only the first time they are needed, and then stored for later use.
+
+For example, \link proland::ElevationCurveData ElevationCurveDatas\endlink
+stores the elevation profile of its curve. The main goal of CurveDatas is to 
+avoid sampling the same point at different levels in different tiles, which 
+would lead to discontinuities (unaligned or cut stripes for example). The 
+CurveData informations are computed at a level which only depends on the Curve's 
+width, to avoid any popping effects between levels. A nice use case for the 
+curvilinear coordinates and cap lengths are the roads (see fig. below): They 
+help to add a special behavior at end nodes but also all along the curve.
+
+\htmlonly
+<center>
+<embed src="graph-curvedatadraw.svg" width="35%" type="image/svg+xml"/><br/>
+<div class="caption">The CurveData class contains a lot of important data for 
+drawing discontinuities-free graphs. The cap lengths allow to determine where 
+a curve intersects with any of her connected curves. When combined with the 
+curvilinear length parameter stored for each point, it is then easy to determine 
+if a stripe should be drawn or not. Also, to avoid discontinuities at tile 
+borders, the same curvilinear length parameter can be used, so that we always 
+know where the current point is inside the curve.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-curvedatadraw.svg
+\htmlonly --> \endhtmlonly
+
+CurveDatas are handled by a proland::CurveDataFactory. By
+default, this factory should be the GraphProducer itself, but it
+can be changed if you need to extend CurveDatas (See
+proland::ElevationGraphLayer and its subclasses: Only the
+\link proland::CurveDataFactory#newCurveData() newCurveData()\endlink
+method should be overriden).
+
+The Factory works quite like a TileProducer: It provides 3 main methods:
+- \link proland::CurveDataFactory#getCurveData() getCurveData()\endlink  :
+If the CurveData doesn't exist, it is created. Otherwise, its usage counter
+is incremented. This one should be used in the startCreateTile part of your
+producers (or getTask in your tasks).
+- \link proland::CurveDataFactory#findCurveData() findCurveData()\endlink :
+Just returns the CurveData, without changing the usage count. This one
+should be used during the execution of the task. Returns NULL if the
+CurveData doesn't exist.
+- \link proland::CurveDataFactory#putCurveData() putCurveData()\endlink  :
+Decrements the usage counter. When a CurveData gets unused (amount of puts()
+equal to the amount of gets()), it is deleted. This function should be used
+in the stopCreateTile part of your producers (or at the end of your task).
+
+CurveDataFactory may also be told which CurveDatas are used in a given
+Tile, which allows to directly call the put() method for each CurveData
+in that Tile. Two methods are defined for that:
+- \link proland::CurveDataFactory#addUsedCurveDatas() addUsedCurveDatas()\endlink:
+Determines the CurveDatas in a tile.
+- \link proland::CurveDataFactory#releaseCurveData() releaseCurveData()\endlink:
+Calls the put method for each CurveData in the given Tile.
+
+Finally, the CurveDataFactory is also a GraphListener, and is therefore
+able to detect when a Curve has changed and updates its CurveData.
+
+
+Like TileProducers, you might want to add dependencies on CurveDatas,
+which can be required in a GraphLayer for example. The
+proland::GetCurveDatasTask task has been created for that purpose.
+It depends on a given Graph, and calls the getCurveData() method for
+each Curve in this Graph.
+
+But sometimes, the user may need specific data about a given Curve all 
+along that Curve, and thus every tile crossed by this Curve. Usually, 
+this would be done in two steps, i.e. two frames (one for computing the 
+graph, and one for computing the Tiles crossed by the curves from this 
+Graph), which is not suitable for usual graph applications. 
+
+GetCurveDatasTask is able to handle that: It changes the TaskGraph
+DURING its execution, after the creation of the Graph and before the
+execution of the Task that needs 'random' tiles. It forces the
+producer to create the tiles that clip its CurveDatas before the
+execution of the task where they are needed.
+
+\htmlonly
+<center>
+<img src="graph-curvedatasexample.png" width="64%">
+<div class="caption">Example of ElevationCurveData: at each tile
+covered by the blue area (the Curve), the Elevation layer must
+know the elevation profile all along the curve. But to avoid
+discontinuities, the CurveData also needs elevations from the
+ElevationProducer which are not necessary all computed (out of
+the screen for example).</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html graph-curvedatasexample.png
+\htmlonly --> \endhtmlonly
+
+\note Remember, you should ALWAYS call the releaseCurveDatas() method
+manually at the end of your task when using GetCurvedataTask, otherwise
+memory will get saturated, since the CurveDatas won't get deleted.
+
+\section sec-producers Terrain producers
+
+The previous graph producers can be used via layers in the terrain
+plugin producers, in order to generate or modify the terrain texture
+or shape based on vector data (e.g. to draw and insert roads on a 
+terrain). These layers are presented below.
+
+\subsection sec-elevation Elevation producer
+
+\subsubsection sec-elevationlayers Graph based layers
+
+- RoadElevationLayer
+
+The  proland::RoadElevationLayer is a proland::TileLayer
+that draws roads on top of an elevation texture. It modifies the terrain
+elevation so that the roads cross sections are horizontal, and so that
+the road elevation profile is smooth, while ensuring a continuous
+transition with the original terrain in the road footprint area.
+
+A proland::RoadElevationLayer can be loaded with the Ork resource
+framework, using the following format:
+\verbatim
+<roadElevationLayer name="roadOrtho1" graph="roadGraph1"
+    cpuElevations="groundElevations1" renderProg="roadLayerElevationShader;"
+    level="3"/>
+\endverbatim
+
+The <tt>graph</tt> attribute must contain the name of a GraphProducer
+that needs to be drawn. The <tt>cpuElevations</tt> attribute must contain
+the name of a TileProducer computing terrain elevations on CPU.	The
+<tt>renderProg</tt> attribute must contain the ork::Program
+used to render the roads. The <tt>level</tt> attribute represents the
+first level at which the Layer will start being displayed. The
+"graph1" example shows how this layer can be used.
+
+- WaterElevationLayer
+
+The proland::WaterElevationLayer is a proland::TileLayer
+TileLayer\endlink that draws rivers on top of an elevation texture. It
+modifies the terrain elevation so that the river cross sections are
+horizontal, and so that the river elevation profile is smooth and always
+decreasing (rivers cannot flow uphill), while ensuring a continuous
+transition with the original terrain in the river footprint area.
+
+A proland::WaterElevationLayer can be loaded with the Ork resource
+framework, using the following format:
+\verbatim
+<waterElevationLayer name="waterOrtho1" graph="waterGraph1"
+    cpuElevations="groundElevations1" renderProg="waterElevationOrthoShader;"
+    fillProg="fillShader;" level="3"/>
+\endverbatim
+
+The <tt>graph</tt> attribute must contain the name of a GraphProducer
+that needs to be drawn. The <tt>cpuElevations</tt> attribute must contain
+the name of a TileProducer computing terrain elevations on CPU.	The
+<tt>renderProg</tt> attribute must contain the ork::Program
+used to render the small rivers. The <tt>fillProg</tt> attribute must
+contain the ork::Program used to render the large rivers
+and lakes. The <tt>level</tt> attribute represents the
+first level at which the Layer will start being displayed. The
+"river1" example shows how this layer can be used.
+
+\subsection sec-orthogpu Ortho GPU producer
+
+\subsubsection sec-orthogpulayers Graph based layers
+
+- LineOrthoLayer
+
+The proland::LineOrthoLayer is a
+proland::TileLayer that draws a graph on top of an ortho
+texture. The graph is drawn with OpenGL lines of one pixel width.
+
+A proland::LineOrthoLayer can be loaded with the Ork resource
+framework, using the following format:
+\verbatim
+<roadOrthoLayer name="lines" graph="myGraph"
+    renderProg="myShader;" level="3"/>
+\endverbatim
+
+The <tt>graph</tt> attribute must contain the name of a GraphProducer
+that needs to be drawn. The <tt>renderProg</tt> attribute must
+contain the ork::Program used to render the lines. The
+<tt>level</tt> attribute represents the first level at which the
+Layer will start being displayed.
+
+- MaskOrthoLayer
+
+The proland::MaskOrthoLayer is a
+proland::TileLayer that draws a graph on top of an ortho
+texture. The graph is drawn by rasterizing its curves and areas,
+with the correct widths. Many options are available to blend
+the result into the current tile, to draw only in some channels,
+to ignore some curves, etc. 
+A typical use of this layer is to modulate a density map
+texture, in order to exclude some areas defined in a graph. For 
+instance, to set a grass or tree density to zero where there are
+roads or rivers (to avoid instancing grass blades or trees in roads
+and rivers). The "river1" example illustrates how this layer 
+can be used.
+
+A proland::MaskOrthoLayer can be loaded with the Ork resource
+framework, using the following format:
+\verbatim
+<maskOrthoLayer name="mask" graph="myGraph"
+    renderProg="myShader;" level="3"
+    withFactor="1" color="255,0,0"
+    ignore="1,2," deform="false"
+    equation="ADD" equationAlpha="ADD" 
+    destinationFunction="ZERO" sourceFunction="ONE" 
+    destinationFunctionAlpha="ZERO" sourceFunctionAlpha="ONE"
+    blendColor="0,0,0,0" channels="r"/>
+\endverbatim
+
+The <tt>graph</tt> attribute must contain the name of a GraphProducer
+that needs to be drawn. The <tt>renderProg</tt> attribute must
+contain the ork::Program used to render the lines. The
+<tt>level</tt> attribute represents the first level at which the
+Layer will start being displayed. The <tt>withFactor</tt> attribute 
+is a factor applied to the curve widths before drawing these curves,
+and the <tt>color</tt> attribute is the color used to draw the curves
+and areas. The <tt>ignore</tt> attribute specifies a list of curve
+types which must be skipped when drawing the graph. Finally the
+<tt>deform</tt> attribute must specify which
+terrain deformation will be applied to the terrain. Currently only
+the "none" and "sphere" values are supported, meaning that the
+terrain will not be deformed, or will be deformed into a sphere (for
+planet rendering).
+The last attributes specify the blending modes and equations
+to blend the layer into the produced tiles, as well as the masks
+used to write only in some channels (r, g, b, and/or a).
+
+- RoadOrthoLayer
+
+The proland::RoadOrthoLayer is a
+proland::TileLayer that draws roads on top of an ortho
+texture. Roads drawing depends on the resolution of the display.
+If the width of the road is smaller than a pixel, the road will
+be drawn with lines, else, with a triangle strip. In addition, a
+quality parameter can be set in order to decide whether to draw
+road stripes, crossroads etc. or not. The "graph1" example
+illustrates how this layer can be used.
+
+A proland::RoadOrthoLayer can be loaded with the Ork resource
+framework, using the following format:
+\verbatim
+<roadOrthoLayer name="roadOrtho1" graph="roadGraph1"
+    renderProg="roadLayerOrthoShader;" level="3"
+    color="64,64,64" dirt="154,121,7" border="43,68,20"
+    border_width="1.2" inner_border_width="2.0"
+    deform="false"/>
+\endverbatim
+
+The <tt>graph</tt> attribute must contain the name of a GraphProducer
+that needs to be drawn. The <tt>renderProg</tt> attribute must
+contain the ork::Program used to render the roads. The
+<tt>level</tt> attribute represents the first level at which the
+Layer will start being displayed. The <tt>color</tt> attribute contains
+the color of roads, in RGB format. The <tt>dirt</tt> attribute contains
+the color of small roads (width 1.0), in RGB format. The <tt>border</tt>
+attribute contains the color of road borders, in RGB format.
+Finally, the <tt>border_width</tt> and <tt>inner_border_width</tt> are
+the size of border (outter and inner borders) added to roads when
+drawing (the <tt>deform</tt> attribute has the same meaning as above).
+
+- WaterOrthoLayer
+
+The proland::WaterOrthoLayer is a proland::TileLayer
+that draws static rivers on top of an ortho texture. In this Layer,
+proland::Area represent large rivers and lakes and
+proland::Curve are drawn as small rivers.
+
+A WaterOrhoLayer can be loaded with the Ork resource framework,
+using the following format:
+\verbatim
+<waterOrthoLayer name="waterOrtho1" graph="waterGraph1"
+    renderProg="waterLayerOrthoShader;" level="3" 
+    color="255,0,255" deform="false"/>
+\endverbatim
+
+The <tt>graph</tt> attribute must contain the name of a GraphProducer
+that needs to be drawn. The <tt>renderProg</tt> attribute must contain
+the ork::Program used to render the rivers. The <tt>level</tt>
+attribute represents the first level at which the Layer will start
+being displayed. Finally, the <tt>color</tt> attribute contains the
+color of rivers, in RGB format. In this example the river will be purple.
+The <tt>deform</tt> attribute has the same meaning as above.
+
+*/

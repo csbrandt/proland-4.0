@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="proland-atmo" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\output\bin\proland-atmo-4_0d" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\build\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="0" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-mthreads" />
+				</Compiler>
+				<Linker>
+					<Add option="$(#twbar.lib)" />
+					<Add library="$(#pthread)" />
+					<Add library="ork3d" />
+					<Add library="proland-core-4_0d" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\output\bin\proland-atmo-4_0" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\build\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="0" />
+				<Compiler>
+					<Add option="-mthreads" />
+					<Add option="-fno-strict-aliasing" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="$(#twbar.lib)" />
+					<Add library="$(#pthread)" />
+					<Add library="ork3" />
+					<Add library="proland-core-4_0" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-march=i686" />
+			<Add option="-pedantic-errors" />
+			<Add option="-pedantic" />
+			<Add option="-Wall" />
+			<Add option="-ansi" />
+			<Add option="-Wno-long-long" />
+			<Add option="-fno-strict-aliasing" />
+			<Add option="-DPROLAND_API=" />
+			<Add option="-DORK_API=" />
+			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DSTBI_NO_STDIO" />
+			<Add option="-DSTBI_NO_WRITE" />
+			<Add directory="$(#tiff.include)" />
+			<Add directory="$(#ork3.include)" />
+			<Add directory="$(#ork3.extern)" />
+			<Add directory="$(#twbar.include)" />
+			<Add directory="sources" />
+			<Add directory="..\core\sources" />
+		</Compiler>
+		<Linker>
+			<Add library="tiff" />
+			<Add directory="$(#tiff.lib)" />
+			<Add directory="$(#ork3.lib)" />
+			<Add directory="..\output\bin" />
+		</Linker>
+		<Unit filename="sources\proland\preprocess\atmo\PreprocessAtmo.cpp" />
+		<Unit filename="sources\proland\preprocess\atmo\PreprocessAtmo.h" />
+		<Unit filename="sources\proland\preprocess\atmo\common.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\constants.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\copyInscatter1.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\copyInscatterN.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\copyIrradiance.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\inscatter1.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\inscatterN.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\inscatterS.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\irradiance1.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\irradianceN.glsl" />
+		<Unit filename="sources\proland\preprocess\atmo\transmittance.glsl" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

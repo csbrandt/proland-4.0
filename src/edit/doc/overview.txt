@@ -1,0 +1,196 @@
+/*! \mainpage notitle
+
+\htmlonly
+<div class="mainpage">
+<br/><h1>Proland Documentation - Edit Plugin</h1>
+\endhtmlonly
+
+\section sec-intro Introduction
+
+The Proland edit plugin provides extended terrain and graph 
+producers allowing the real-time edition of their data. <i>This
+plugin requires the terrain, graph and river plugins at compile
+time, but only those actually used are needed at runtime (e.g. if
+you only use the extended terrain plugin producers, then you 
+don't need the graph and river plugins to use this plugin).</i>
+
+\section sec-edit Terrain edition
+
+Terrain edition capabilities are provided via elevation and ortho
+producer subclasses to edit elevation and ortho maps, and via a dedicated
+layer to edit graphs. They allow the interactive edition of the terrain
+shape, of any terrain map (color map, tree density map, etc), and of terrain
+graphs. Then, any data that depend on edited data (such as terrain normals)
+is automatically recomputed via the producer framework, based on the 
+Ork task scheduling framework. The "edit1", "edit2", "edit3", and 
+"edit4" examples illustrate these terrain edition features.
+
+\subsection sec-edit-dem Edit Elevation producer
+
+Terrain elevations can be edited by using the proland::EditResidualProducer
+and proland::EditElevationProducer classes together, instead of
+the proland::ResidualProducer and proland::ElevationProducer classes.
+
+The proland::EditResidualProducer is a subclass of proland::ResidualProducer
+that stores in memory a set of modified tiles. When asked to produce a tile,
+this producer first look in the previous set to see if a modified version
+of this tile is available in memory. If so it simply returns this tile.
+Otherwise it delegates the tile production to its super class, which will
+load the tile from disk.
+
+The proland::EditResidualProducer#editedTile method is used to notify this
+producer that a new version of a tile is available. This method takes as
+parameter logical tile coordinates, as well as the <i>difference</i>
+between the current and the new version of the tile. When all modified tiles
+have been notified with this method, the 
+proland::EditResidualProducer#updateResiduals must be called to recompute
+the residual tiles at all levels in the quadtree, using the upsampling 
+filter defined in \ref sec-residual.
+
+The proland::EditElevationProducer is a subclass of proland::ElevationProducer
+with two main additional methods:
+<ul>
+<li>the first one, proland::EditElevationProducer#edit, takes as parameter
+a 2D path in local
+terrain physical coordinates, and draws this path in the fourth channel of
+the elevation tiles in the cache (this channel is supposed unused). It then blends
+this fourth channel into the third one (containing the modified elevations).</li>
+<li>the second method, proland::EditElevationProducer#update, reads backs
+the modified tiles on CPU, computes the differences between the current
+and new elevations (i.e. between the first and third channels), sends them
+to the residual producer with proland::EditResidualProducer#editedTile, and
+finally asks the residual producer to recompute the residuals with 
+proland::EditResidualProducer#updateResiduals.</li>
+</ul>
+
+\note the proland::EditElevationProducer can <b>not</b> have layers. Indeed,
+the modifications produced by any layer would be incorporated in the residual
+tiles at the first edition attempt, which is not a desired behavior. The 
+workaround for this is to use two elevation producers: a first edit elevation
+producer, without layers, and a normal elevation producer, with a 
+proland::TextureLayer to copy the tiles from the first producer, and other
+layers to modify these copied tiles (not the original ones).
+
+The "edit1" example shows how proland::EditResidualProducer and
+proland::EditElevationProducer can be used.
+
+\subsection sec-edit-ortho Edit Ortho producer
+
+Terrain maps (color map, density map, etc) can be edited by using the 
+proland::EditOrthoCPUProducer
+and proland::EditOrthoProducer classes together, instead of
+the proland::OrthoCPUProducer and proland::OrthoProducer classes.
+
+The proland::EditOrthoCPUProducer is a subclass of proland::OrthoCPUProducer
+that stores in memory a set of modified tiles. When asked to produce a tile,
+this producer first look in the previous set to see if a modified version
+of this tile is available in memory. If so it simply returns this tile.
+Otherwise it delegates the tile production to its super class, which will
+load the tile from disk.
+
+The proland::EditOrthoCPUProducer#editedTile method is used to notify this
+producer that a new version of a tile is available. This method takes as
+parameter logical tile coordinates, as well as the <i>difference</i>
+between the current and the new version of the tile. When all modified tiles
+have been notified with this method, the 
+proland::EditOrthoCPUProducer#updateResiduals must be called to recompute
+the residual tiles at all levels in the quadtree, using the upsampling 
+filter defined in \ref sec-ortho.
+
+The proland::EditOrthoProducer is a subclass of proland::OrthoProducer
+with two main additional methods:
+<ul>
+<li>the first one, proland::EditElevationProducer#edit, takes as parameter
+a 2D path in local
+terrain physical coordinates, and draws this path (with some blending) in
+the ortho tiles in the cache (before that it reads these tiles back on CPU,
+in order to be able to compute color differences later on).</li>
+<li>the second method, proland::EditOrthoProducer#update, reads backs
+the modified tiles on CPU, computes the differences between the current
+and new colors (using the copy made before edition - see above), sends them
+to the residual producer with proland::EditOrthoCPUProducer#editedTile, and
+finally asks the residual producer to recompute the residuals with 
+proland::EditOrthoCPUProducer#updateResiduals.</li>
+</ul>
+
+\note the proland::EditOrthoProducer can <b>not</b> have layers. Indeed,
+the modifications produced by any layer would be incorporated in the residual
+tiles at the first edition attempt, which is not a desired behavior. The 
+workaround for this is to use two ortho producers: a first edit ortho
+producer, without layers, and a normal ortho producer, with a 
+proland::TextureLayer to copy the tiles from the first producer, and other
+layers to modify these copied tiles (not the original ones).
+
+The "edit2" example shows how proland::EditOrthoCPUProducer and
+proland::EditOrthoProducer can be used.
+
+\subsection sec-edit-graph Edit Graph Ortho layer
+
+The \link proland::EditGraphOrthoLayer EditGraphOrthoLayer \endlink class
+is a \link proland::TileLayer TileLayer\endlink that draws
+the control points of an unflattened Graph on tiles produced by an
+\link proland::OrthoGPUProducer OrthoGPUProducer \endlink,
+and allows the user to edit it interactively. Changes will then be
+propagated to the GraphListeners that share the same root Graph
+via the \link proland::Graph#notifyListeners() notifyListeners()\endlink
+method.  \link proland::EditGraphOrthoLayer EditGraphOrthoLayer \endlink class
+uses Graph Tiles produced by a
+\link proland::GraphProducer GraphProducer \endlink. It contains
+a vector of GraphProducers, so it can switch between them via the
+\link proland::EditGraphOrthoLayer#setEditedGraph() setEditedGraph() \endlink
+method, and then display and edit different Graphs corresponding
+to each of these GraphProducers.
+
+This class also provides the functions to edit the Graph. You can :
+- \link proland::EditGraphOrthoLayer#select() Select\endlink a
+point or a segment of a Curve. This point/segment will then be used
+for edition functions, until you select another point.
+- \link proland::EditGraphOrthoLayer#movePoint() Move\endlink a point.
+- \link proland::EditGraphOrthoLayer#addCurve() Add\endlink a
+Curve (From 0, 1 or 2 existing Nodes).
+- \link proland::EditGraphOrthoLayer#addNode() Split\endlink a
+Curve / \link proland::EditGraphOrthoLayer#removeNode() Merge\endlink
+2 Curves.
+- \link proland::EditGraphOrthoLayer#removeCurve() Remove\endlink a Curve.
+- \link proland::EditGraphOrthoLayer#addControlPoint() Add\endlink
+or \link proland::EditGraphOrthoLayer#removeControlPoint() remove\endlink
+a point from a Curve.
+- \link proland::EditGraphOrthoLayer#removeNode() Remove\endlink
+a point linking several Curves.
+- \link proland::EditGraphOrthoLayer#transformControlPoint() Transform\endlink
+a ControlPoint.
+- \link proland::EditGraphOrthoLayer#fitCurve() Create\endlink a smoothed curved by 
+pressing SHIFT while moving the mouse.
+- Smooth a point by selecting it and pressing CTRL while moving the move.
+
+An EditGraphOrthoLayer can be loaded with the Ork resource framework,
+using the following format:
+\verbatim
+<editGraphLayer name="myEditGraphLayer"
+   graphs="myFirstGraphProducer,anotherGraphProducer,yetAnotherGraphProducer"
+   level = "3" softEdition="true" softEditionDelay="0.1"/>
+\endverbatim
+
+The <tt>graphs</tt> attribute must contain the names of the different
+GraphProducers that we want to be managed by this EditGraphOrthoLayer.
+In this example, 3 GraphProducers will be used.
+The <tt>level</tt> attribute represents the first level at which the
+Layer will start being displayed. Finally, a <tt>softEdition</tt> mode can be enabled. It allows
+to only update the graph when releasing the mouse. If set to false, the graph will be updated every 
+<tt>softEditionDelay</tt> seconds.
+
+The "edit3" example shows how proland::EditGraphOrthoLayer can be used.
+
+\subsection sec-edit-hydrograph Edit HydroGraph Ortho layer
+
+This editor is just the same as the previous one, but adds a few functionnalities 
+related to HydroGraphs.
+- Change the potential of a curve.
+- Link a bank and its river axis.
+- Dynamically and automatically link newly created banks to nearest river axis. 
+If the result is not satisfying for the user, there is always the possibility to 
+manually edit the result afterwards.
+
+The "edit4" example shows how proland::EditHydroGraphOrthoLayer can be used.
+
+*/

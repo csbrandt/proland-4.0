@@ -1,0 +1,1048 @@
+/*! \mainpage notitle
+
+\htmlonly
+<div class="mainpage">
+<br/><h1>Proland Documentation - Terrain Plugin</h1>
+\endhtmlonly
+
+\section sec-intro Introduction
+
+The Proland terrain plugin provides some producers dedicated to the
+production of terrain elevation data, as well as generic raster data
+(this data can represent anything you want, such as reflectances, 
+land cover classes, normal maps, horizon maps, ambient occlusion 
+maps, etc).
+
+\ref sec-producers
+<ul>
+  <li>\ref sec-residual</li>
+  <li>\ref sec-elevation</li>
+  <li>\ref sec-normal</li>
+  <li>\ref sec-orthocpu</li>
+  <li>\ref sec-orthogpu</li>
+  <li>\ref sec-ortho</li>
+  <li>\ref sec-example</li>
+</ul>
+
+\section sec-producers Terrain plugin producers
+
+This section presents the predefined producers provided by the
+Proland terrain plugin. Some producers are dedicated to the production of
+terrain elevation data, others are designed to produce generic raster
+data (this data can represent anything you want, such as
+reflectances, land cover classes, normal maps, horizon maps, ambient
+occlusion maps, etc).
+
+\subsection sec-residual Residual producer
+
+A straightforward way to produce elevation tiles is to load
+precomputed tiles from disk. This strategy can be implemented with an
+\ref sec-orthogpu "ortho producer", by interpreting the tile data as
+elevations. With this strategy each tile can be produced
+independently. The problem is to produce elevation tiles at higher
+resolution than the precomputed tiles: if you use a nearest or linear
+interpolation to generate new elevations, the resulting terrain does
+not look realistic.
+
+This is why Proland also proposes another strategy, based on a
+"multiresolution subdivision surface" approach: at each quadtree
+level except the root, elevation tiles are computed by <i>
+upsampling</i> the parent tile, and by adding to it <i>residual</i>
+elevations. Elevation tiles are then produced on the fly, from 
+<i>residual tiles</i>. These residual tiles can be precomputed and
+stored on disk. They can also be procedural: by using random
+residuals whose amplitude decreases with the quadtree level, a
+fractal terrain is obtained through the upsampling and add procedure.
+An advantage of this approach is that, with a careful choice for the
+upsampling scheme, the limit surface after many upsampling operations
+can be smooth \htmlonly(C<sup>&#8734;</sup>)\endhtmlonly. Hence the
+terrain can be generated at a higher resolution than what the
+precomputed residuals describe, and still be smooth, by using null
+residuals for the missing scales (or a procedural noise, to add
+fractal details at small scales). Another advantage of this strategy
+is that the residual tiles can be better compressed than the raw
+elevations.
+
+The figure below illustrates these relations between the elevation
+and residual tiles:
+
+\htmlonly
+<center>
+<embed src="upsampling.svg" width="80%" type="image/svg+xml"/><br/>
+<div class="caption">Relation between elevation and residual
+tiles.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html upsampling.svg
+\htmlonly --> \endhtmlonly
+
+Note that both the elevation and residual tiles have a border
+(represented with the gray part outside the blue and green squares).
+This border is equal to two pixels. The root elevation tile is a copy
+of the root residual tile. The others are obtained by upsampling a
+quarter of their parent tile, and by adding the corresponding
+residual tile to the result. More precisely the <i>interior</i> of
+each tile (i.e., the tile without its border) is obtained by
+upsampling a quarter of the interior of the parent tile.
+
+The upsampling filter is used to produce elevation tiles, but it is
+also necessary to (pre)compute the residual tiles. Indeed the
+residuals needed to obtain a given terrain after upsampling obviously
+depend on the upsampling filter. This filter is defined on the figure
+below. It ensures a smooth limit surface:
+
+\htmlonly
+<center>
+<embed src="residuals.svg" width="95%" type="image/svg+xml"/><br/>
+<div class="caption">The upsampling filter used for producing
+elevation tiles.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html residuals.svg
+\htmlonly --> \endhtmlonly
+
+The example on this figure assumes that elevation tiles have 5x5
+interior samples, which gives 9x9 samples with the borders. Each
+sample is supposed to be used to displace the vertices of a grid mesh
+made of 4x4 quads (represented on the left). In the general case, an
+elevation tile must have (<i>n</i>+5)x(<i>n</i>+5) samples, including
+borders, for a grid mesh of <i>n</i>x<i>n</i> quads, where <i>n</i>
+is even. The lower left corner of the elevation tile on the left,
+made of 3x3 interior samples, is upsampled into 5x5 new interior
+samples (9x9 samples with borders) as shown by the colored dots in
+the center, for a finer mesh still made of 4x4 quads. The new samples
+are computed as weighted averages of the parent samples, by using the
+rules on the right, depending on their position:
+<ul>
+<li>a red sample is simply equal to the parent sample at the same
+position (i.e., the upsampling filter is an interpolating filter, as
+opposed to an approximating one).</li>
+
+<li>a green sample is equal to a weighted average of the four
+neighbor parent samples on its horizontal line, with the -1/16, 9/16,
+9/16 and -1/16 weights.</li>
+
+<li>a blue sample is defined in a similar way, using the four
+neighbor parent samples on its vertical line.</li>
+
+<li>finally a yellow sample is defined a weighted average of its
+sixteen neighbor parent samples, with weights defined by the tensor
+product of the above weights, i.e., 1/256, -9/256, etc.</li>
+</ul>
+
+\note to compute the upsampled inner samples we need a one pixel
+border in the parent tile. To perform a second upsampling step we
+then need a one pixel border in upsampled tiles. This requires a two
+pixels border in the parent tile. Hopefully the required border does
+not grow unbounded. In fact a two pixels border is sufficient to
+apply recursively any number of upsampling steps.
+
+The proland::ResidualProducer class is a producer that can load
+in CPU memory precomputed residual tiles stored on disk. The residual
+tiles must be stored in files containing tile "pyramids", one file
+per pyramid (these files can be produced with proland::preprocessDem
+and proland::preprocessSphericalDem - see also the "preprocess"
+example):
+
+\htmlonly
+<center>
+<embed src="residualfiles.svg" width="60%" type="image/svg+xml"/>
+<br/>
+<div class="caption">Storage of residual tiles on files.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html residualfiles.svg
+\htmlonly --> \endhtmlonly
+
+There must be at least one file, containing all the residual tiles of
+the quadtree from the root to some maximum quadtree level. Other
+files can then be used to provide more resolution at some places.
+These files also contain a quadtree pyramid, but start from a
+different tile than the root tile. In the example above the main file
+contains all the tiles up to (and including) level 5. An additional
+file contains 5 more levels, starting from the tile (5,28,3) and
+containing all the sub tiles of this tile, up to level 5+5=10.
+
+Each file must have the following format. The file should start with
+a header made of 6 32 bits integers and a 32 bits float:
+- <tt>minLevel</tt>: see below.
+- <tt>maxLevel</tt>: maximum level of the tiles in this file,
+relatively to the starting tile.
+- <tt>tileSize</tt>: size of the residual tiles in pixels, including
+borders, minus 5.
+- <tt>rootLevel</tt>: level of the starting tile of the pyramid in
+the absolute quadtree.
+- <tt>rootTx</tt>: tx coordinate of the starting tile in the absolute
+quadtree.
+- <tt>rootTy</tt>: ty coordinate of the starting tile in the absolute
+quadtree.
+- <tt>scale</tt>: scaling factor for the residual values in this
+file.
+
+The <tt>minLevel</tt> must be 0 if <tt>rootLevel</tt> is not 0.
+Otherwise it indicates the level of the first tile in the pyramid of
+size <tt>tileSize</tt>. The tiles at level <tt>minLevel</tt>-1, <tt>
+minLevel</tt>-2, ..., 0 are supposed to have a size of <tt>
+tileSize</tt>/2, <tt>tileSize</tt>/4, ..., <tt>tileSize</tt>/2<sup>
+<tt>minLevel</tt></sup>. The scale factor is used to convert the
+residuals, stored as integers, into height differences in some length
+unit (e.g., meters). A <tt>scale</tt> of 1 gives a 1 meter precision
+in altitudes. A <tt>scale</tt> of 0.1 gives a 0.1 meter precision,
+and so on.
+
+This header must be followed by an array <tt>offsets</tt> of 2.<i>
+ntiles</i> 32 bits offsets (<i>ntiles</i> being equal to the number
+of tiles in the pyramid, i.e., <tt>minLevel</tt> + (2<sup>max(<tt>
+maxLevel</tt> - <tt>minLevel</tt>, 0) * 2 + 2</sup> - 1) / 3. These
+offsets indicate the location of the tiles in the rest of the file,
+starting from the end of this array. A tile of coordinates
+(level,tx,ty), <i>relatively to the starting tile</i> (<tt>
+rootLevel</tt>,<tt>rootTx</tt>,<tt>rootTy</tt>), must be stored
+between <tt>offsets</tt>[2<i>i</i>] and <tt>offsets</tt>[2<i>i</i>
++1], where <i>i</i> is the tile index, <i>i</i>=<tt>minLevel</tt> +
+tx + ty * 2<sup><i>l</i></sup> + (2<sup>2.<i>l</i></sup> - 1) / 3,
+with <i>l</i>=max(level - <tt>minLevel</tt>, 0) (or <i>i</i>=level if
+level < <tt>minLevel</tt>). Between these two offsets, the tile must
+be stored in TIFF format, using 16 bits per pixel, in a single strip.
+
+\note tiles with different coordinates can have the same offsets.
+This is useful to avoid storing many times identical tiles (such as
+"empty" tiles).
+
+\subsubsection sec-resresidual Residual producer resource
+
+A residual producer can be loaded with the Ork resource framework,
+using the following format (see the "terrain4" example for a
+concrete example):
+
+\verbatim
+<residualProducer name="myResidualProducer"
+    cache="myCache" file="..." delta="0" scale="1"/>
+\endverbatim
+
+The <tt>cache</tt> attribute must be the name of a tile cache
+resource (its tile storage <i>must</i> be a <tt>
+cpuFloatTileStorage</tt>, with a tileSize of <tt>tileSize+5</tt>).
+The <tt>file</tt> attribute must be the name of the file containing
+the residual tiles, in the above format. The optional <tt>scale</tt>
+attribute can be used to scale all residuals with some scaling
+factor. Its default value 1 does not change the residuals. Finally
+the optional <tt>delta</tt> attribute can be used to choose a
+different root level than the "real" root level. Indeed a 
+<tt>getTile(level,tx,ty)</tt> on a residual producer loads the tile 
+<tt>(level+delta,tx,ty)</tt> from the residuals file. Hence 
+<tt>getTile(0,0,0)</tt> loads the tile <tt>(delta,0,0)</tt>. 
+<tt>delta</tt> must be between 0 (the default) and <tt>minLevel</tt>.
+
+\remark more precisely, if <tt>delta</tt> is not null, 
+<tt>getTile(0,0,0)</tt> returns the result of the upsampling and add
+procedure, applied to the tiles from level 0 to level <tt>delta</tt>
+included. Hence the returned tile can be used as a normal "root" tile
+in an elevation producer (see next section).
+
+\remark if <tt>minLevel</tt> is not null the first residual tiles do
+not have the same size as the others. But they are always returned in
+a (<tt>tileSize</tt>+5)x(<tt>tileSize</tt>+5) array, in the lower
+left corner:
+
+\htmlonly
+<center>
+<embed src="residualtiles.svg" width="80%" type="image/svg+xml"/>
+<br/>
+<div class="caption">Storage of the residual tiles (in red, with
+borders in dark gray) at level 0, 1 and 2 or more, assuming that 
+<tt>minLevel</tt>=2 and <tt>tileSize</tt>=8. All tiles are stored in
+13x13 arrays (in light gray).</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html residualtiles.svg
+\htmlonly --> \endhtmlonly
+
+A residual producer can use several tile pyramids stored in several
+tile files. This can be done as follows:
+
+\verbatim
+<residualProducer name="myResidualProducer" cache="myCache"
+file="main">
+    <residualProducer cache="myCache" file="region1"/>
+    <residualProducer cache="myCache" file="region2">
+        <residualProducer cache="myCache" file="region2-1"/>
+        ...
+    </residualProducer>
+    ...
+    <residualProducer cache="myCache" file="regionN"/>
+</residualProducer>
+\endverbatim
+
+The above producer will use the <tt>main</tt> file for the first
+levels of the quadtree, plus the <tt>region1</tt>, <tt>region2</tt>,
+... <tt>regionN</tt> files to add more resolution in some regions.
+This schema is recursive, e.g., <tt>region2-1</tt> adds even more
+resolution in a sub region of <tt>region2</tt>.
+
+\subsection sec-elevation Elevation producer
+
+The proland::ElevationProducer produces terrain elevations from
+the residual tiles produced by a residual producer. This GPU producer
+upsamples parent elevations tiles and adds to them residual tiles, as
+described in the previous section, all this using shaders on GPU.
+This producer can have layers, which can be used to modify the
+elevations after they have been produced with the previous method.
+
+\subsubsection sec-elevationinput Input data
+
+The proland::ElevationProducer can be used with several kinds of
+input. In particular it can be used with or without a residual
+producer:
+<ul>
+<li>If an elevation producer is used without a residual producer,
+pseudo random deterministic residuals will be automatically
+generated. In this case the user must specify the noise amplitude for
+each quadtree level. This mode can be used to produce random fractal
+terrains. The "terrain1", "terrain2" and "terrain3" examples illustrate
+this option.</li>
+
+<li>If an elevation producer is used with a residual producer,
+two options are available to generate details at a higher
+resolution than what the residual producer provides. By default, no
+details are generated, which results in a smooth surface. The other
+option is to add fractal details, by specifying a noise amplitude for
+the quadtree levels for which there are no residual tiles. The
+"terrain4" example illustrates the first option.</li>
+</ul>
+
+In both cases the "upsampling and add" shader, specified by the user,
+can also be used to get different results from the same inputs. For
+instance a basic shader can simply use the same noise amplitudes
+at each point of the terrain. A more complex shader can modulate
+these amplitudes based on the local altitude, slope or curvature
+of the terrain. In the first case uniform fratal details are generated
+everywhere. In the second case the noise can be adapted to the local 
+terrain - for instance to generate more noise in mountains than in
+plains (these two cases are demonstrated in the "upsampleShader" shader
+of the "terrain1" and "terrain2" examples).
+
+\htmlonly
+<center>
+<img src="elevation-options.jpg" width="80%"><br/>
+<div class="caption"><i>Top left</i>: random residuals produce a
+fractal terrain. <i>Top right</i>: precomputed residuals from a
+residual producer, no added details. <i>Bottom</i>: same terrain with
+uniform noise (<i>left</i>) or with non-uniform noise (<i>right</i>).</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html elevation-options.jpg
+\htmlonly --> \endhtmlonly
+
+\subsubsection sec-elevationoutput Output data
+
+The produced elevation data has 3 components per pixel, noted
+(zf,zc,zm) - if no layers are used you don't need to store the
+third component. The first component is the elevation, as produced by
+the above upsampling and add procedure. The second component is a 
+<i>coarse elevation</i>, i.e., the elevation of the parent tile at the
+same point (the goal is to perform an interpolation between zf and zc
+at rendering, to avoid popping when quads are suddenly subdivided -
+see \ref sec-quadblend). The third component is a modified elevation.
+By default it is equal to zf, but the layers can modify its value.
+
+The elevations zf are computed from the unmodified elevations zf of
+the parent tile, using the upsampling filter described in the
+previous section. But the coarse elevations zc are computed from the
+<i>modified</i> elevations zm of the parent tile, using <i>linear</i>
+interpolation. Indeed zc is intended to give the elevation of the
+parent <i>mesh</i>, made of planar triangles (hence the linear
+interpolation). For this we need to know which mesh will be used to
+render each terrain quad. Indeed elevation tiles can be rendered with
+meshes of several sizes, provided the elevation tile size is a
+multiple of the mesh size (note: the mesh diagonal <i>must</i> be
+oriented from "north west" to "south east"):
+
+\htmlonly
+<center>
+<embed src="elevation.svg" width="80%" type="image/svg+xml"/><br/>
+<div class="caption">An 9x9 elevation tile (13x13 with borders) can
+be used with 8x8, 4x4, 2x2 or 1x1 meshes.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html elevation.svg
+\htmlonly --> \endhtmlonly
+
+Once the mesh size is known we can find which parent samples must be
+interpolated to compute the coarse elevations zc:
+
+\htmlonly
+<center>
+<embed src="elevation2.svg" width="80%" type="image/svg+xml"/><br/>
+<div class="caption">Coarse elevations are linearly interpolated from
+the modified parent elevations. The parent samples used depend on the
+mesh size.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html elevation2.svg
+\htmlonly --> \endhtmlonly
+
+\note Using a mesh size smaller than the elevation tile size can be
+useful if you want to render the terrain with a "coarse" mesh, but
+with a high resolution normal map for the terrain shading. For
+instance you can use for each tile (192+5)x(192+5) elevations, from
+which you compute (192+1)x(192+1) normals. You can then render the
+elevations with a grid made of 24x24 quads, but with a (192+1)
+x(192+1) normal map, which gives 8 times more resolution for normals
+(the images above were produced with these settings).
+
+\subsubsection sec-reselevation Elevation producer resource
+
+An elevation producer can be loaded with the Ork resource framework,
+using the following format:
+
+\verbatim
+<elevationProducer name="myElevationProducer"
+    cache="myCache" residuals="myResidualProducer"
+    upsampleProg="upsampleShader;" blendProg="blendShader;"
+    noise="100,50,25,12,6,3,2,1" face="0"
+    gridSize="24" flip="false"/>
+\endverbatim
+
+The elevation tiles are produced in the tile cache resource specified
+by the <tt>cache</tt> attribute. This cache must have an associated
+<tt>gpuTileStorage</tt>. The size of the tiles in this storage define
+the size of the elevation tiles that will be produced (including
+borders). The <tt>residuals</tt> attribute specifies the name of a
+residual producer (it need not be a proland::ResidualProducer;
+any CPU producer producing float values in the same format can be
+used). This attribute is optional. If it is not present, the 
+<tt>noise</tt> attribute must be defined (see below).
+
+\note the <tt>gpuTileStorage</tt> that stores the elevation tiles
+must use 16 or 32 bits float per channel, but it can use less than 4
+channels. For instance if you don't use terrain deformations, the
+fourth component w is not needed. Similarly, if you don't use layers
+to modify the terrain elevation, the third component is not needed.
+
+\note The elevation and residual tiles can have different sizes. More
+precisely the size of the residual tiles must be a multiple of the
+elevation tile size. For instance if the residual tiles are of size
+(192+5)x(192+5), the elevation tiles can be (192+5)x(192+5), (96+5)
+*(96+5), (48+5)x(48+5), (24+5)x(24+5), etc (the elevation producer
+takes care of selecting the right "sub tile", if necessary, of the
+residual tiles to produce an elevation tile).
+
+The optional <tt>upsampleProg</tt> and <tt>blendProg</tt> attributes specify
+the shaders to use to perform the "upsample and add" operation, and
+to blend layers into elevation tiles. Their default values are
+<tt>upsampleShader;</tt> and <tt>blendShader;</tt>. The 
+<tt>blendProg</tt> program is not necessary if no layers are used.
+The Proland examples illustrate how these shaders must and can be 
+implemented (in particular the "terrain1", "terrain2" and "graph1"
+examples).
+
+The optional <tt>noise</tt> attribute must specify noise amplitudes,
+one per quadtree level. These amplitudes are used to
+generate a fractal terrain or to add fractal details to an
+existing terrain. The optional <tt>face</tt> attribute specifies
+to which cube face this producer corresponds, if 6 producers are
+used to model a planet (see \ref sec-deform). Face numbers must be 
+between 1 and 6 (1 is north pole face, 6 is south pole face - the
+"terrain2" example shows how the faces must be organized). If the
+producer name ends with a digit between 1 and 6, then the face
+attribute is not necessary: it is extracted from the name. This face
+identifier is used to produce random noise without seams between cube
+faces.
+
+The <tt>gridSize</tt> attribute must specify the size in quads of the
+mesh that will be used to render each terrain quad. This size is
+needed to correctly compute the coarse elevations zc (see above).
+
+Finally the optional <tt>flip</tt> attribute indicates if the
+terrain rendering shader will flip the terrain mesh diagonals 
+dynamically, based on the elevation of the four corners of each
+"quad" of this mesh, in order to reduce the geometric aliasing of
+terrain silhouettes:
+
+\htmlonly
+<center>
+<img src="elevation-flip.jpg" width="80%"><br/>
+<div class="caption">With dynamic diagonal flipping (<i>left</i>)
+geometric aliasing is reduced compared to basic rendering (<i>right</i>).</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html elevation-flip.jpg
+\htmlonly --> \endhtmlonly
+
+This option is then set in the 
+<tt>upsampleProg</tt> shader, which can then compute correct coarse 
+elevations despite this dynamic flipping. The "terrain4" example 
+illustrates how this option can be used (see the modifications
+in the <tt>helloworld.xml</tt> file, in the <tt>upsampleShader.glsl</tt>
+and <tt>terrainShader.glsl</tt> code, and in the <tt>quad.mesh</tt>
+file).
+
+\subsection sec-normal Normal producer
+
+The proland::NormalProducer produces terrain normals from the
+elevation tiles produced by an elevation producer. This GPU producer
+computes normals with finite differences, using shaders on GPU.
+
+\subsubsection sec-normalinput Input data
+
+The input data of the proland::NormalProducer are the elevation
+tiles produced by an elevation producer. This elevation producer need
+not be an proland::ElevationProducer: any GPU producer producing
+float elevation values in the same format (3 or 4 components per
+sample, 2 pixel border, etc.) can be used. The normal producer
+computes the normals from the modified elevations zm (see \ref sec-elevation).
+
+\subsubsection sec-normaloutput Output data
+
+The produced normal tiles have four components per pixel noted
+(nx,ny,ncx,ncy), and have no border (you can store only the first two
+values if you want). The first components (nx,ny)
+give the x,y components of the normal at this point (the vertical
+component z can be computed as the square root of 1-nx*nx-ny*ny). The
+last components (ncx,ncy) give the x,y components of a <i>coarse
+normal</i> at this point, i.e., the interpolated normal of the parent
+<i>mesh</i> at this point (assuming that normals are fetched in a
+vertex shader and interpolated linearly on each mesh triangle - but
+it is also possible to use the produced normals as a normal map,
+i.e., to fetch them in a fragment shader). The goal is to perform an
+interpolation between the normal and the coarse normal at rendering,
+to avoid popping when quads are suddenly subdivided - see \ref sec-quadblend.
+Like for \ref sec-elevationoutput "elevations", the size
+of the grid that will be used to render each terrain quad must be
+known to correctly compute of the coarse normals.
+
+\note the normals are computed in the tangent frame of the <i>base
+surface</i> at the center of the tile (i.e. a single tangent frame is
+used for all the vertices of a tile). By default the base surface is
+the horizontal plane. If \ref sec-deform "terrain deformations" are
+used, it can be a sphere, a cylinder, etc.
+
+\subsubsection sec-resnormal Normal producer resource
+
+An normal producer can be loaded with the Ork resource framework,
+using the following format:
+
+\verbatim
+<normalProducer name="myNormalProducer"
+    cache="myCache" elevations="myElevationProducer"
+    normalProg="normalShader;"
+    gridSize="24" deform="none"/>
+\endverbatim
+
+The normal tiles are produced in the tile cache resource specified by
+the <tt>cache</tt> attribute. This cache must have an associated 
+<tt>gpuTileStorage</tt>. The size of the tiles in this storage define the
+size of the normal tiles that will be produced (recall that they have
+no border). The <tt>elevations</tt> attribute specifies the name of
+the elevation producer (it need not be a
+proland::ElevationProducer) from which the normals will be
+computed.
+
+\note the <tt>gpuTileStorage</tt> that stores the normal tiles can
+use integer or float values, and it can use 2 or 4 channels per
+pixel. With float values the normal coordinates between -1 and 1 are
+stored as is. With integer coordinates they are mapped to 0..1 first
+(using (x+1)/2, (y+1)/2). If two channels are used, the coarse
+normals will simply be discarded. In summary the possible formats are
+RGBA8, RGBA16F, RGBA32F, IA8, IA16F, IA32F. Also the elevation and
+normal tile sizes <i>must</i> be equal. For instance, if the
+elevation tiles are (192+5)x(192+5), the normal tiles must be 
+(192+1)x(192+1).
+
+The optional <tt>normalProg</tt> attribute specifies
+the shader to use to compute the normals from the elevations.
+Its default values is <tt>normalShader;</tt>.
+The Proland examples illustrate how these shaders must and can be 
+implemented (in particular the "terrain1" and "terrain2" examples).
+
+The <tt>gridSize</tt> attribute must specify the size in quads of the
+mesh that will be used to render each terrain quad. This size is
+needed to correctly compute the coarse normals nc (see above).
+
+Finally the optional <tt>deform</tt> attribute must specify which
+terrain deformation will be applied to the terrain. Currently only
+the "none" and "sphere" values are supported, meaning that the
+terrain will not be deformed, or will be deformed into a sphere (for
+planet rendering). This value controls the tangent frame in which the
+normals are computed (see above).
+
+\subsection sec-orthocpu Ortho CPU producer
+
+The proland::OrthoCPUProducer class is a producer that can
+load in CPU memory precomputed tiles stored on disk. The tiles
+content is not processed by the ortho producers, and can be
+interpreted as you want: reflectances, land cover classes, normal
+maps, horizon maps, ambient occlusion maps, etc. Like for
+\ref sec-residual "residual tiles", the tiles must be stored in files
+containing tile "pyramids", one file per pyramid (these files can 
+be produced with proland::preprocessOrtho and 
+proland::preprocessSphericalOrtho - see also the "preprocess"
+example):
+
+\htmlonly
+<center>
+<embed src="orthofiles.svg" width="60%" type="image/svg+xml"/><br/>
+<div class="caption">Storage of ortho tiles on files.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html orthofiles.svg
+\htmlonly --> \endhtmlonly
+
+There must be at least one file, containing all the ortho tiles of
+the quadtree from the root to some maximum quadtree level. Other
+files can then be used to provide more resolution at some places.
+These files also contain a quadtree pyramid, but start from a
+different tile than the root tile. In the example above the main file
+contains all the tiles up to (and including) level 5. An additional
+file contains 5 more levels, starting from the tile (5,28,3) and
+containing all the sub tiles of this tile, up to level 5+5=10.
+
+Each file must have the following format. The file should start with
+a header made of 7 32 bits integers:
+- <tt>maxLevel</tt>: maximum level of the tiles in this file,
+relatively to the starting tile.
+- <tt>tileSize</tt>: size of the ortho tiles in pixels, without
+borders.
+- <tt>channels</tt>: the number of components per pixel, between 1
+and 4.
+- <tt>rootLevel</tt>: level of the starting tile of the pyramid in
+the absolute quadtree.
+- <tt>rootTx</tt>: tx coordinate of the starting tile in the absolute
+quadtree.
+- <tt>rootTy</tt>: ty coordinate of the starting tile in the absolute
+quadtree.
+- <tt>flags</tt>: indicates if tiles have borders and if they are
+compressed (see below).
+
+The <tt>flags</tt> field is a bitset. If the bit 0 is set it means
+that tiles are stored in DXT format (otherwise they are stored in
+TIFF  - in uncompressed, deflate, jpeg, etc. format). If the bit 1 is
+set it means that tiles have a 2 pixels border (otherwise they have
+no border).
+
+This header must be followed by an array <tt>offsets</tt> of 2.<i>
+ntiles</i> 64 bits offsets (<i>ntiles</i> being equal to the number
+of tiles in the pyramid, i.e., (2<sup><tt>maxLevel</tt> * 2 + 2</sup> - 1) / 3.
+These offsets indicate the location of the tiles in the
+rest of the file, starting from the end of this array. A tile of
+coordinates (level,tx,ty), <i>relatively to the starting tile</i>
+(<tt>rootLevel</tt>,<tt>rootTx</tt>,<tt>rootTy</tt>), must be stored
+between <tt>offsets</tt>[2<i>i</i>] and <tt>offsets</tt>[2<i>i</i>
++1], where <i>i</i> is the tile index, 
+<i>i</i>=tx + ty * 2<sup><i>level</i></sup> + 
+(2<sup>2.<i>level</i></sup> - 1) / 3. Between these
+two offsets, the tile must be stored in TIFF or DXT format (as
+indicated by <tt>flags</tt> - if TIFF is used each tile must be
+stored in a single strip).
+
+\subsubsection sec-resorthocpu Ortho CPU producer resource
+
+An ortho CPU producer can be loaded with the Ork resource framework,
+using the following format:
+
+\verbatim
+<orthoCpuProducer name="myOrthoCpuProducer" cache="myCache" file="..."/>
+\endverbatim
+
+The <tt>cache</tt> attribute must be the name of a tile cache
+resource. Its tile storage <i>must</i> be a <tt>
+cpuByteTileStorage</tt>, with a tileSize of <tt>tileSize</tt> - or
+<tt>tileSize+4</tt> if tiles have a border. The number of channels of
+this tile storage must also be equal to <tt>channels</tt>. The 
+<tt>file</tt> attribute must be the name of the file containing the ortho
+tiles, in the above format.
+
+An ortho producer can use several tile pyramids stored in several
+tile files. This can be done as follows:
+
+\verbatim
+<orthoCpuProducer name="myOrthoCpuProducer" cache="myCache"
+file="main">
+    <orthoCpuProducer cache="myCache" file="region1"/>
+    <orthoCpuProducer cache="myCache" file="region2">
+        <orthoCpuProducer cache="myCache" file="region2-1"/>
+        ...
+    </orthoCpuProducer>
+    ...
+    <orthoCpuProducer cache="myCache" file="regionN"/>
+</orthoCpuProducer>
+\endverbatim
+
+The above producer will use the <tt>main</tt> file for the first
+levels of the quadtree, plus the <tt>region1</tt>, <tt>region2</tt>,
+... <tt>regionN</tt> files to add more resolution in some regions.
+This schema is recursive, e.g., <tt>region2-1</tt> adds even more
+resolution in a sub region of <tt>region2</tt>. The "graph1"
+example illustrates how an ortho CPU producer can be used.
+
+\subsection sec-orthogpu Ortho GPU producer
+
+The proland::OrthoGPUProducer class is a producer that can
+load tiles in GPU memory, from tiles already stored in main memory
+(such as tiles produced by an ortho CPU producer). By default the
+tiles are simply copied from CPU to GPU memory. But this producer can
+also have layers, which can modify this content after it has been
+copied to GPU (using GPU shaders).
+
+\subsubsection sec-orthogpulayers Predefined layers
+
+- EmptyOrthoLayer
+
+The proland::EmptyOrthoLayer is a proland::TileLayer that
+simply fills a tile with a constant color. It can be used
+as a first layer to provide a background color for other
+layers. 
+
+A proland::EmptyOrthoLayer can be loaded with the Ork resource
+framework, using the following format:
+\verbatim
+<emptyOrthoLayer name="background" color="255,255,255"/>
+\endverbatim
+The "river1" example illustrates how this layer can be used.
+
+- TextureLayer
+
+The proland::TextureLayer is a proland::TileLayer that
+draws a quad on top of an ortho texture, using as input
+a tile produced by another ortho GPU producer (in fact
+any producer using a GPU tile storage), and a program
+to transform this external tile before blending it into
+the tile being produced. 
+
+A typical use of this layer is to add layers to an 
+OrthoProducer (see below). Indeed a proland::OrthoProducer
+cannot have layers itself. The workaround is to define,
+in addition to this OrthoProducer, an OrthoGPUProducer with
+a proland::TextureLayer using as input the OrthoProducer.
+It is then possible to add other layers to the OrthoGPUProducer.
+This approach is illustrated in the "exercise2" example.
+
+A proland::TextureLayer can be loaded with the Ork resource
+framework, using the following format:
+\verbatim
+<textureLayer name="background" 
+    producer="backgroundOrthoGpu1" 
+    renderProg="copyShader;" 
+    tileSamplerName="sourceSampler" 
+    equation="ADD" equationAlpha="ADD" 
+    destinationFunction="ZERO" sourceFunction="ONE" 
+    destinationFunctionAlpha="ZERO" sourceFunctionAlpha="ONE"/>
+\endverbatim
+The <tt>producer</tt> attribute must contain the name of
+a tile producer using a GPUTileStorage. It specifies the
+external tiles that will be composed into the tiles produced
+by the producer to which this layer belongs.
+The <tt>renderProg</tt> attribute specifies the program
+used to transform the external tiles of <tt>producer</tt>
+before they are blended in the produced tiles.
+The <tt>tileSamplerName</tt> specifies the name of the
+uniform in <tt>renderProg</tt> which is used to access the
+external tiles (see \ref sec-samplertileglsl).
+The last attributes specify the blending modes and equations
+to blend the transformed external tiles into the produced 
+tiles.
+
+\subsubsection sec-resorthogpu Ortho GPU producer resource
+
+An ortho GPU producer can be loaded with the Ork resource framework,
+using the following format:
+
+\verbatim
+<orthoGpuProducer name="myOrthoGpuProducer"
+    cache="myCache" backgroundCache="myCache" 
+    ortho="myOrthoCpuProducer"/>
+\endverbatim
+
+The <tt>cache</tt> attribute must be the name of a tile cache
+resource (its tile storage <i>must</i> be a <tt>gpuTileStorage</tt>).
+
+The optional <tt>backgroundCache</tt> attribute must be the 
+name of a tile cache resource (its tile storage <i>must</i> be
+a <tt>gpuTileStorage</tt>), which may be the same as <tt>cache</tt>.
+This attribute is only necessary if layers are used (see the
+"graph1" example).
+
+The optional <tt>ortho</tt> attribute must be the name of the producer that
+produces the CPU tiles that will be copied to GPU by this ortho GPU
+producer (it need not be a proland::OrthoCPUProducer).
+This attribute is necessary if this producer does not have layers.
+Otherwise, it can be omitted. The tiles will then be produced by
+the layers alone (the "river1" example illustrates this option. The
+"graph1" example illustrates the first option).
+
+\note the CPU and GPU tile sizes <i>must</i> be equal. For instance
+if the CPU producer produces tiles of size 192x192, with a 2 pixels
+border, then the <tt>gpuTileStorage</tt> of the ortho GPU producer
+must use GPU tiles of size (192+2*2)x(192+2*2)=196x196. However the
+<tt>gpuTileStorage</tt> can use a different number of channels per
+pixel, and the format of the channels is free (8 bits, 16 bits float,
+32 bits float, etc).
+
+\subsection sec-ortho Ortho producer
+
+The proland::OrthoProducer produces terrain textures from
+the residual tiles produced by a residual producer (<i>not</i> a
+proland::ResidualProducer but, for instance, a
+proland::OrthoCPUProducer containing precomputed color
+residuals). 
+
+\subsubsection sec-orthoinput Input Data
+
+The proland::OrthoProducer can be used with several kinds of
+input. In particular it can be used with or without a residual
+producer:
+<ul>
+<li>If an ortho producer is used without a residual producer,
+pseudo random deterministic residuals will be automatically
+generated. In this case the user must specify the noise amplitude for
+each quadtree level. This mode can be used to produce random fractal
+textures. The "terrain3" examples illustrate this option.</li>
+
+<li>If an ortho producer is used with a residual producer,
+two options are available to generate details at a higher
+resolution than what the residual producer provides. By default, no
+details are generated, which results in a smooth texture. The other
+option is to add fractal details, by specifying a noise amplitude for
+the quadtree levels for which there are no residual tiles.</li>
+</ul>
+
+In both cases the "upsampling and add" shader, specified by the user,
+can also be used to get different results from the same inputs, in
+a similar way as the proland::ElevationProducer.
+
+\subsubsection sec-orthooutput Output Data
+
+The ortho producer upsamples parent color tiles and
+adds to them residual tiles, in a similar way as described in
+\ref sec-residual, but using a different upsampling filter. This
+filter is defined below (it is more adapted to color textures, where
+samples are taken at the center of each texel, whereas the filter
+for elevation textures was designed for odd number of samples,
+corresponding to mesh vertices).
+
+\htmlonly
+<center>
+<embed src="ortho-residuals.svg" width="95%" type="image/svg+xml"/><br/>
+<div class="caption">The upsampling filter used for producing
+ortho tiles.</div>
+</center>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html ortho-residuals.svg
+\htmlonly --> \endhtmlonly
+
+The example on this figure assumes that texture tiles have 4x4
+interior samples, which gives 8x8 samples with the borders. Each
+sample lies at the center of a texel (represented with black squares).
+The lower left corner of the color tile on the left,
+made of 2x2 interior samples, is upsampled into 4x4 new interior
+samples (8x8 samples with borders) as shown by the colored dots in
+the center, for a finer texture still made of 4x4 interior texels.
+The new samples are computed as weighted averages of the parent
+samples, by using the rules on the right, depending on their position
+(all weigths are divided by 16, their sum is 1).
+
+The advantage of proland::OrthoProducer compared to
+proland::OrthoGPUProducer is that the limit texture after many
+upsampling operations is smooth
+\htmlonly(C<sup>&#8734;</sup>)\endhtmlonly. Hence the texture can be
+generated at a higher resolution than what the precomputed residuals
+describe, and still be smooth, by using null residuals for the missing
+scales. Another advantage is that this producer supports real-time
+edition (see \ref sec-edit-ortho). The drawback is that this
+producer requires more GPU memory than proland::OrthoGPUProducer
+(all the ancestors of a tile must also be present on GPU, for better
+performance).
+
+\subsubsection sec-ortholayers Predefined layers
+
+In general a proland::OrthoProducer can <b>not</b> have layers. 
+Indeed, any layer would modify the result of the "upsample and add"
+step above, and these modifications would then be upsampled at
+the next quadtree levels, producing unwanted results (the reason 
+why the elevation producer can have layers is that an elevation 
+requires a single channel, and that layers modify a separate 
+channel, not used by the upsampling; but this is generally not 
+possible with a texture producer, because a color typically 
+uses 3 or 4 channels. However, with a monochrome OrthoProducer,
+layers could be used if they modify a separate channel, using
+the same approach as in ElevationProducer).
+
+The workaround for this is to use a proland::TextureLayer (see above).
+
+\subsubsection sec-resortho Ortho producer resource
+
+An ortho producer can be loaded with the Ork resource framework,
+using the following format:
+
+\verbatim
+<orthoProducer name="myOrthoProducer"
+    cache="myCache" residuals="myOrthoCpuProducer" 
+    scale="1" maxLevel="16" upsampleProg="upsampleOrthoShader;"
+    hsv="true" cnoise="10,20,30" noise="200,180,160,140,120,100"
+    face="0"/>
+\endverbatim
+
+The <tt>cache</tt> attribute must be the name of a tile cache
+resource (its tile storage <i>must</i> be a <tt>gpuTileStorage</tt>).
+The <tt>residuals</tt> attribute must be the name of 
+the producer that produces the CPU residual tiles that will be used
+by this ortho GPU producer (it need not be a proland::OrthoCPUProducer).
+This attribute is optional. If it is not present, the 
+<tt>noise</tt> attribute must be defined (see below).
+
+\note the CPU and GPU tile sizes <i>must</i> be equal. For instance
+if the residual producer produces tiles of size 192x192, with a 2 pixels
+border, then the <tt>gpuTileStorage</tt> of the ortho producer
+must use GPU tiles of size (192+2*2)x(192+2*2)=196x196. However the
+<tt>gpuTileStorage</tt> can use a different number of channels per
+pixel, and the format of the channels is free (8 bits, 16 bits float,
+32 bits float, etc).
+
+The optional <tt>scale</tt> attribute is a scaling factor 
+applied to residuals before they are added to the upsampled tiles.
+The optional <tt>maxLevel</tt> attribute can be used to set a maximum
+level for the tiles produced by this producer (by default there is no
+limit).
+
+The optional <tt>upsampleProg</tt> attribute specifies
+the shader to use to perform the "upsample and add" operation. Its
+default value is <tt>upsampleOrthoShader;</tt>.
+The Proland examples illustrate how this shader must and can be 
+implemented (in particular the "terrain3" example).
+
+The optional <tt>noise</tt> attribute must specify noise amplitudes,
+one per quadtree level. These amplitudes are used to
+generate a fractal texture or to add fractal details to an
+existing texture. The noise color is specified by the <tt>cnoise</tt>
+attribute, and the <tt>hsv</tt> attribute specifies whether this
+color is in HSV or RGB space.
+
+The optional <tt>face</tt> attribute specifies
+to which cube face this producer corresponds, if 6 producers are
+used to model a planet (see \ref sec-deform). Face numbers must be 
+between 1 and 6 (1 is north pole face, 6 is south pole face - the
+"terrain2" example shows how the faces must be organized). If the
+producer name ends with a digit between 1 and 6, then the face
+attribute is not necessary: it is extracted from the name. This face
+identifier is used to produce random noise without seams between cube
+faces.
+
+\subsection sec-example An example
+
+A scene with a single terrain described with residual tiles stored in
+a <tt>DEM.dat</tt> file, and with texture tiles stored in an 
+<tt>ORTHO.dat</tt> file, can be described in an Ork archive file as
+follows:
+
+\dontinclude terrain.xml
+
+\until normalProducer
+
+The above resources define a residual producer using the 
+<tt>DEM.dat</tt> file, with tiles of size (192+5)x(192+5). It is used by
+an elevation producer using tiles of size (24+5)x(24+5) cached in a
+storage of 1600 slots, itself used by a normal
+producer using tiles of the same size but without borders, (24+1)
+x(24+1), in a storage of 1600 slots.
+
+\until orthoGpuProducer
+
+The above resources define an ortho CPU producer using the 
+<tt>ORTHO.dat</tt> file, with tiles of size (192+4)x(192+4). It is used
+by an ortho GPU producer using tiles of the same size, cached in a
+storage of 400 slots.
+
+\until </node>
+
+The above resources define a terrain node for a terrain of size 100km
+x 100km, with elevations between 0 and 5000m, using a split distance
+factor of 2 to subdivide the terrain quadtree up to level 16
+(included). Then a scene node resource is defined for this terrain:
+it references the terrain via the "terrain" field, and associates
+with it 3 texture tile samplers to be able to access the elevation,
+normal and ortho texture tiles from the terrain shader. The terrain
+scene node also specifies the grid to be used to draw each terrain
+quad, the method to be used to update the terrain node, the method to
+draw it, and the shader to be used to draw the terrain.
+
+\until </node>
+\until </node>
+
+Finally a scene graph is defined, containing a camera and the
+previous terrain scene node. The <tt>updateTerrainMethod</tt>
+resource is defined as follows:
+
+\include updateTerrain.xml
+
+in other words it updates the terrain quadtree "this.terrain" and
+then the texture tile samplers of the scene node to which the method
+belongs. In our case "this.terrain" refers to the "terrain" field of
+"myTerrainNode", which itself refers to "myTerrain". And the texture
+tile samplers are those of the "myTerrainNode" scene node, i.e., the
+"zSampler", "nSampler" and "rgbSampler" samplers. The <tt>
+drawTerrainMethod</tt> can be defined as follows:
+
+\include drawTerrain.xml
+
+in order to first set a program using the shader "this.material"
+(which in our case refers to "myTerrainNode.material", which itself
+refers to the "terrainShader" shader), before drawing each visible
+leaf quad using the mesh "this.mesh" (which in our case refers
+ultimately to "grid25.mesh").
+
+Finally the <tt>terrainShader</tt> shader should have the following
+form in order to access the elevation, normal and ortho tiles of the
+current quad:
+
+\code
+#include "textureTile.glsl"
+
+uniform samplerTile zSampler;
+uniform samplerTile nSampler;
+uniform samplerTile rgbSampler;
+
+#ifdef _VERTEX_
+layout(location=0) in vec4 vertex;
+out vec2 uv;
+void main() {
+    ...
+    uv = vertex.xy;
+    vec4 z = textureTile(zSampler, uv);
+    vec4 n = textureTile(nSampler, uv);
+    ...
+}
+#endif
+
+#ifdef _FRAGMENT_
+in vec2 uv;
+layout(location=0) out vec4 color;
+void main() {
+    ...
+    vec4 rgba = textureTile(rgbSampler, uv);
+    ...
+}
+#endif
+\endcode
+
+*/

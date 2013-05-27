@@ -1,0 +1,89 @@
+/*! \page page-examples Examples
+
+\htmlonly
+<div class="mainpage">
+\endhtmlonly
+
+\section sec-ocean1 Ocean1 example
+
+\htmlonly
+<img src="ocean1.png"><br/>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html ocean1.png
+\htmlonly --> \endhtmlonly
+
+This example is based on the paper "Real-time Realistic Ocean Lighting
+using Seamless Transitions from Geometry to BRDF", Eric Bruneton, Fabrice
+Neyret and Nicolas Holzschuch, Eurographics 2010, and on the associated 
+source code (basic version). It also uses the atmosphere model of the
+"atmo" example, which must be run at least once before running this
+example (in order to generate the precomputed atmospheric textures).
+
+The "HelloWorld.cpp" is taken from the "Edit1" example. The ocean
+shader and the proland::DrawOceanTask are based on the source code
+provided with the above paper, with two improvements: support for
+spherical oceans, and improved management of the horizon (see 
+\ref sec-oceans).
+
+In the scene graph description, the method to draw the ocean must be
+declared like this:
+
+\dontinclude ocean1/helloworld.xml
+\skip drawOceanMethod
+\until /sequence
+
+This indicates that we want to use a spherical ocean (with a radius
+of 6360005), which must be drawn when the altitude of the camera is
+less than 20000. We must also specify the shader that contains the
+uniforms related to ocean lighting.
+
+The ocean scene node is then very simple:
+
+\dontinclude ocean1/helloworld.xml
+\skip name="ocean"
+\until /node
+
+\section sec-ocean2 Ocean2 example
+
+\htmlonly
+<img src="ocean2.png"><br/>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html ocean2.png
+\htmlonly --> \endhtmlonly
+
+This example is based on the paper "Real-time Realistic Ocean Lighting
+using Seamless Transitions from Geometry to BRDF", Eric Bruneton, Fabrice
+Neyret and Nicolas Holzschuch, Eurographics 2010, and on the associated 
+source code (improved version). It also uses the atmosphere model of the
+"atmo" example, which must be run at least once before running this
+example (in order to generate the precomputed atmospheric textures).
+
+The "HelloWorld.cpp" is taken from the "Edit1" example. The ocean
+shader and the proland::DrawOceanFFTTask are based on the source code
+provided with the above paper, with two improvements: support for
+spherical oceans, and improved management of the horizon (see 
+\ref sec-oceans).
+
+In the scene graph description, the method to draw the ocean must be
+declared like this:
+
+\dontinclude ocean2/helloworld.xml
+\skip drawOceanFFTMethod
+\until /sequence
+
+This indicates that we want to use a spherical ocean (with a radius
+of 6360005), which must be drawn when the altitude of the camera is
+less than 20000. We must also specify the shader that contains the
+uniforms related to ocean lighting.
+
+The ocean scene node is then very simple:
+
+\dontinclude ocean2/helloworld.xml
+\skip name="ocean"
+\until /node
+
+*/

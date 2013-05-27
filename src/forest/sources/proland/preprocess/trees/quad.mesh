@@ -1,0 +1,11 @@
+const char* quadSource = "0 1 0 1 0 0\n\
+trianglestrip\n\
+1\n\
+0 3 float false\n\
+4\n\
+0 0 0\n\
+1 0 0\n\
+0 1 0\n\
+1 1 0\n\
+0\n\
+";

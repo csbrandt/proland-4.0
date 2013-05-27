@@ -1,0 +1,226 @@
+/*! \page page-examples Examples
+
+\htmlonly
+<div class="mainpage">
+\endhtmlonly
+
+\section sec-helloworld HelloWorld example
+
+\htmlonly
+<img src="helloworld.png"><br/>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html helloworld.png
+\htmlonly --> \endhtmlonly
+
+This example is a minimal example using only the proland terrain framework
+(see \ref sec-terrain), without any producer. It simply uses a dynamic
+quadtree, and draws each terrain quad with an OpenGL quad and a simple
+shader.
+
+\subsection sec-helloworld-main Main class
+
+The main class is defined as follows:
+
+\dontinclude helloworld/HelloWorld.cpp
+
+\skip <stdlib.h>
+\until bool rotate;
+
+Here we simply include the headers we need, and declare a subclass of
+ork::GlutWindow. This class will define what must be drawn at each
+frame, and how mouse and keyboard events must be handled. For this
+it uses a ork::SceneManager, i.e., the scene to be rendered, as well
+as a proland::TerrainViewController to hold the current camera position,
+and three additional fields to handle mouse events.
+
+\until Logger::ERROR_LOGGER
+
+The constructor first sets up some Ork loggers. By default the DEBUG
+logger is null, and the INFO, WARNING and ERROR logger simply log to
+the command line. Here we create file loggers around the default loggers,
+in order to also log events into the "log.html" file.
+
+\until setResourceManager
+
+We then create a resource loader, and configure it to load resources
+from the current directory and from the "helloworld.xml" archive file.
+Then we create a resource manager using this loader, and a ork::SceneManager
+using this resource manager.
+
+\until setCameraMethod
+
+We finally configure the scene manager: we set its task scheduler by loading
+it with the resource loader, we set its scene graph by loading it with the
+resource loader, and we finally define which node and method to use for the
+camera.
+
+\until TerrainViewController
+\until }
+
+As a last step in this constructor, we create an object that will hold the
+current camera position, and which will also set the corresponding 
+transformation matrices in the camera node (given by 
+<tt>manager->getCameraNode()</tt>). 2500.0 is the initial camera altitude.
+
+\until ERROR_LOGGER != NULL
+\until ERROR_LOGGER->flush
+\until }
+\until }
+
+The redisplay method defines how the scene must be rendered at each frame.
+Its implementation is very simple, as most of the work is done by the scene
+manager. The first two lines copy the camera position stored in the view
+controller into the scene node corresponding to the camera. The following
+lines clear the screen, update the scene graph, and draw it on screen. 
+Finally the overriden redisplay method is called to actually display
+the new frame (this method internally calls glutSwapBuffer).
+
+\until GlutWindow::reshape
+\until }
+
+The reshape method is called when the window is resized. It simply updates
+the viewport of the screen framebuffer to match the new window size.
+
+\until updateResources
+\until }
+\until }
+
+The idle method is called when no other event occured. Its damaged argument
+indicates whether a part of the window has been uncovered by another window
+since the last call to this method, or if the window just got the focus. If
+it is the case, we check if resources have changed on disk, and if so we
+update them (all this is done by the updateResources method).
+
+\until WHEEL_UP
+\until return true;
+\until }
+
+The mouseClick, mouseMotion and mouseWheel methods implement a simple
+user interface to navigate in the terrain. A mouse drag translates the
+camera, while a mouse drag with CTRL rotates the camera around the point
+of the terrain which is at the center of the screen. Finally the mouse 
+wheel moves the camera closer or farther away from this "center point". These
+methods are implemented by modifying the x0 and y0 fields in the view 
+controller (which correspond to the terrain coordinates of the center point),
+its theta and phi fields (which correspond to the camera orientation around
+the center point), and its d field (which corresponds to the distance between
+the camera and the center point).
+
+\until break;
+\until return true;
+\until }
+
+The keyTyped and specialKey method handle keyboard events. Here they
+simply stop the program when ESC (ASCII code 27) is pressed, and update
+the resources when F5 is pressed.
+
+\until return 0;
+\until }
+
+The rest of the code simply declares a static instance of the HelloWorld
+window, creates this instance, and starts the event loop. The atexit call
+ensures that Object::exit is called when the application stops, in order
+to clean up everything before exiting.
+
+\subsection sec-helloworld-res Resources
+
+The above code is fairly generic, and its result mainly depends on how
+the scene graph is defined. This scene graph is defined in the following
+"helloworld.xml" archive file:
+
+\dontinclude helloworld/helloworld.xml
+\skip <?xml
+\until multithreadScheduler
+
+The first resource defined in this archive is the scheduler. Here it is
+a multithread scheduler using 3 threads (which is not really necessary
+here for such a simple example).
+
+\until /sequence
+
+The second resource is the camera method, which defines how the whole
+scene must be rendered. Here this method calls the "update" method
+on each scene node having the "dynamic" flag, and then calls the
+"draw" method on each scene node having the "object" flag".
+
+\until terrainNode
+
+The third resource is the terrain. Here we define a terrain of size 500
+(i.e. its bounding box will be [-500,500]x[-500,500]), whose altitudes are
+between -1 and 1, and which will be subdivided with a split factor of 2,
+up to the quadtree level 7 at most.
+
+\until /sequence
+
+The fourth resource is the "update" method for the scene node corresponding
+to the terrain. This method simply calls the proland::UpdateTerrainTask,
+which subdivides the terrain quadtree based on the current camera position.
+The terrain is supposed to be defined by the "terrain" field of the scene
+node on which this method is called.
+
+\until /sequence
+
+The fifth resource is the "draw" method for the scene node corresponding
+to the terrain. This method sets the shader whose id in the terrain scene
+node is "material" and then calls the proland::DrawTerrainTask to draw
+each visible leaf quad of the terrain, by drawing the mesh whose id
+in the terrain scene node is "grid" (using the previous shader).
+As above, the terrain is supposed to be defined by the "terrain" field
+of the scene node on which this method is called.
+
+\until module
+
+This resource defines the shader that will be used to draw each terrain
+quad. It simply specifies the GLSL version of this shader, and the file
+that contain the shader source code.
+
+\until /archive
+
+Finally the last resource defines the scene graph, using the previously
+defined resources (resource can in fact be defined in any order). This scene
+graph contains only two nodes. The first one is the camera node, which
+only contains one method, the one to draw the scene (defined above). The 
+second node corresponds to the terrain. It has two flags, "object" and
+"dynamic" (cf the definition of the camera method). Its bounding box
+is defined, consistently with the terrain size (see above). The "terrain"
+field required by the updateTerrainMethod and drawTerrainMethod methods
+is set to the "myTerrain" terrain, defined above. The "grid"
+mesh required by the drawTerrainMethod method is set to the mesh defined
+in the "quad.mesh" file. Similarly, the "material" shader required by
+the drawTerrainMethod is set to the "terrainShader" module defined above.
+Finally the "draw" and "update" methods called by the camera method are
+set to the "drawTerrainMethod" and "updateTerrainMethod" defined above.
+
+In order to complete the scene graph description, we simply need to 
+provide the "quad.mesh" and "terrainShader.glsl" files. The first one
+is very simple:
+
+\include helloworld/quad.mesh
+
+It specifies a mesh whose bounding box is [0,1]x[0,1]x[0,0], made of
+triangle strips, whose vertices have a single attribute, made of 3 
+unnormalized floats. The 4 vertices are then specified, and
+the last 0 indicates that this mesh is not indexed. In fact it is a simple
+quad made of two triangles.
+
+The terrain shader is also quite simple:
+
+\dontinclude helloworld/terrainShader.glsl
+\skip uniform struct
+\until _FRAGMENT_
+\until #endif
+
+The deformation uniforms are set by the proland::DrawTerrainTask before
+drawing each terrain quad. Here we only need the "offset" and "localToScreen"
+values. The "offset" value indicates how the [0,1]x[0,1] vertex coordinates must 
+be transformed to get the terrain physical coordinates for this quad. 
+The "localToScreen" matrix transforms these physical coordinates to screen
+coordinates. Both uniforms are used in the vertex shader to compute 
+gl_Position. The fragment shader is a simple "procedural shader" based
+on the physical coordinates p output by the vertex shader. The last line
+produces a "checkerboard pattern" to easily see the terrain quads, i.e,
+to show how the terrain quadtree is subdivided when the camera moves.
+
+*/

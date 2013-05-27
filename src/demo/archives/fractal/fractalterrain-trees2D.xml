@@ -1,0 +1,157 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<archive>
+    <multithreadScheduler name="defaultScheduler" nthreads="3" fps="0"/>
+
+    <!-- --------------- REDEFINITIONS --------------- -->
+
+    <module name="treeBrdf" version="330" source="treeBrdf.glsl" options="TREES,ALPHASHADOWMAP">
+        <uniformSampler name="treeShadowMap" texture="treeShadowMap"/>
+    </module>
+
+    <!-- --------------- GROUND DEM --------------- -->
+
+    <tileCache name="groundElevations" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="101" nTiles="512"
+            internalformat="RGB32F" format="RGB" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <elevationProducer name="groundElevations1" cache="groundElevations" noise="-140,-100,-15,-8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+
+    <tileCache name="groundNormals" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="97" nTiles="512"
+            internalformat="RG8" format="RG" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <normalProducer name="groundNormals1" cache="groundNormals" elevations="groundElevations1"/>
+
+    <!-- --------------- GROUND ORTHO --------------- -->
+
+    <tileCache name="groundOrthoGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="100" nTiles="512"
+            internalformat="RGB8" format="RGB" type="UNSIGNED_BYTE" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"
+            anisotropy="16"/>
+    </tileCache>
+    <orthoProducer name="groundOrthoGpu1" cache="groundOrthoGpu" hsv="true" rnoise="50,128,0,0" cnoise="25,12.5,127.5" noise="0,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255"/>
+
+    <!-- --------------- GROUND LCC --------------- -->
+
+    <tileCache name="groundLccGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="100" nTiles="512"
+            internalformat="RGB8" format="RGB" type="UNSIGNED_BYTE" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"
+            anisotropy="16"/>
+    </tileCache>
+    <orthoProducer name="groundLccGpu1" cache="groundLccGpu" maxLevel="7" cnoise="127.5,127.5,0,0" noise="0,255,255,255,255" upsampleProg="globalsShaderFS;upsampleLccShader;">
+        <textureLayer name="slopeFilter1" producer="groundNormals1" renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>
+        <textureLayer name="elevationFilter1" producer="groundElevations1" renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>
+    </orthoProducer>
+    <lccProducer name="groundLcc1" density="groundLccGpu1" plants="trees"/>
+
+    <!-- --------------- GROUND NODES --------------- -->
+
+    <terrainNode name="terrain" size="50000" zmin="0" zmax="5000" splitFactor="2" maxLevel="16"/>
+
+    <!-- --------------- SCENE --------------- -->
+
+    <node name="terrainNode" flags="object,dynamic">
+        <bounds xmin="-50000" xmax="50000" ymin="-50000" ymax="50000" zmin="0" zmax="5000"/>
+        <field id="terrain" value="terrain"/>
+        <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations1" storeInvisible="false"/>
+        <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals1" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" sampler="orthoSampler" producer="groundOrthoGpu1" storeParent="true" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLcc1" storeParent="true" storeInvisible="false"/>
+        <mesh id="grid" value="grid25.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="fractalTerrainShader"/>
+    </node>
+
+    <plants name="trees"
+        selectProg="globalsShaderGS;selectTreeShader;"
+        shadowProg="globalsShaderGS;globalsShaderFS;renderTreeShadow2D;"
+        renderProg="globalsShaderGS;globalsShaderFS;atmosphereShaderGS;renderTreeShader2D;"
+        minLevel="5" maxLevel="7" maxDistance="5000.0" tileCacheSize="400"
+        lodDistance="1400.0" minDensity="8500" maxDensity="8500" patternCount="10">
+    </plants>
+
+    <node name="scene">
+        <node flags="camera">
+            <method id="draw" value="cameraMethod"/>
+            <module id="globals" value="globalsShaderFS"/>
+        </node>
+
+        <node name="sun" flags="light">
+            <translate x="0" y="-1" z="0"/>
+            <method id="draw" value="sunMethod"/>
+        </node>
+
+        <node name="terrain" value="terrainNode"/>
+
+        <node name="plants" flags="object,shadow">
+            <bounds xmin="-50000" xmax="50000" ymin="-50000" ymax="50000" zmin="0" zmax="5000"/>
+            <field id="terrain" value="terrainNode"/>
+            <method id="draw" value="drawPlantsMethod"/>
+            <method id="shadow" value="drawPlantsShadowMethod"/>
+        </node>
+
+        <node name="oceanFFT" flags="object">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <method id="draw" value="drawFlatOceanFFTMethod"/>
+            <module id="material" value="oceanFFTShader"/>
+        </node>
+
+        <node name="sky" flags="object">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <mesh id="geometry" value="quad.mesh"/>
+            <method id="draw" value="raycastMethod"/>
+            <module id="material" value="sky2Shader"/>
+        </node>
+
+        <node flags="overlay">
+            <method id="draw" value="drawTweakBarMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="logMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="infoMethod"/>
+        </node>
+    </node>
+
+    <!-- --------------- USER INTERFACE --------------- -->
+
+    <basicViewHandler name="viewHandler" viewManager="window"/>
+
+    <tweakScene name="editScene" scene="scene" active="false"/>
+
+    <tweakBarManager name="tweakBar" next="viewHandler">
+        <editor id="resources" bar="prolandTweakBar" permanent="true" exclusive="false"/>
+        <editor id="scene" bar="editScene" exclusive="false"/>
+    </tweakBarManager>
+
+    <eventRecorder name="eventRecorder" recorded="window" videoDirectory="video/frame-%.5d.tga" cursorTexture="cursor" next="tweakBar"/>
+
+    <prolandDemo name="window" ui="eventRecorder" view="viewHandler"/>
+
+</archive>

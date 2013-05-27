@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="proland-edit-examples-edit3" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\..\output\examples\edit\edit3\edit3d" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="examples\edit3" />
+				<Option object_output="..\..\..\build\Debug\examples\edit3" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="ork3d" />
+					<Add library="proland-core-4_0d" />
+					<Add library="proland-terrain-4_0d" />
+					<Add library="proland-graph-4_0d" />
+					<Add library="proland-edit-4_0d" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\..\output\examples\edit\edit3\edit3" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="examples\edit3" />
+				<Option object_output="..\..\..\build\Release\examples\edit3" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add library="ork3" />
+					<Add library="proland-core-4_0" />
+					<Add library="proland-terrain-4_0" />
+					<Add library="proland-graph-4_0" />
+					<Add library="proland-edit-4_0" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-march=i686" />
+			<Add option="-pedantic-errors" />
+			<Add option="-pedantic" />
+			<Add option="-Wall" />
+			<Add option="-ansi" />
+			<Add option="-Wno-long-long" />
+			<Add option="-fno-strict-aliasing" />
+			<Add option="-DPROLAND_API=" />
+			<Add option="-DORK_API=" />
+			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DSTBI_NO_STDIO" />
+			<Add option="-DSTBI_NO_WRITE" />
+			<Add directory="$(#ork3.include)" />
+			<Add directory="$(#ork3.extern)" />
+			<Add directory="$(#twbar.include)" />
+			<Add directory="..\..\..\core\sources" />
+			<Add directory="..\..\..\terrain\sources" />
+			<Add directory="..\..\..\graph\sources" />
+			<Add directory="..\..\sources" />
+		</Compiler>
+		<Linker>
+			<Add directory="$(#ork3.lib)" />
+			<Add directory="..\..\..\output\bin" />
+		</Linker>
+		<Unit filename="DEM.dat" />
+		<Unit filename="HelloWorld.cpp" />
+		<Unit filename="blendShader.glsl" />
+		<Unit filename="editLayerShader.glsl" />
+		<Unit filename="helloworld.xml" />
+		<Unit filename="normalShader.glsl" />
+		<Unit filename="quad.mesh" />
+		<Unit filename="roadLayerElevationShader.glsl" />
+		<Unit filename="roadLayerOrthoShader.glsl" />
+		<Unit filename="roads.graph" />
+		<Unit filename="terrainShader.glsl" />
+		<Unit filename="text.png" />
+		<Unit filename="textShader.glsl" />
+		<Unit filename="upsampleShader.glsl" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

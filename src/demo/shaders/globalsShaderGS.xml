@@ -1,0 +1,37 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?><?xml version="1.0" ?>
+<module name="globalsShaderGS" version="330" geometry="globalsShader.glsl">
+    <uniform1f name="hdrExposure" x="0.4"/>
+    <uniform4f name="pencil" x="0.0" y="0.0" z="0.0" w="-1.0"/>
+    <uniform4f name="pencilColor" x="0.0" y="0.0" z="0.5" w="0.0"/>
+    <uniform3f name="seaColor" x="0.00392" y="0.01568" z="0.04705"/>
+    <uniform1f name="seaRoughness" x="0.02"/>
+    <uniform1f name="treeHeight1" x="3.15"/>
+    <uniform1f name="treeBase1" x="0.0"/>
+    <uniform1f name="treeHeight2" x="2.1"/>
+    <uniform1f name="treeBase2" x="0.0"/>
+    <uniform1f name="treeDensity" x="1.0"/>
+</module>

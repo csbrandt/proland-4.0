@@ -1,0 +1,195 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<archive>
+    <multithreadScheduler name="defaultScheduler" nthreads="3" fps="0"/>
+
+    <!-- --------------- GROUND DEM --------------- -->
+
+    <tileCache name="groundElevations" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="101" nTiles="1296"
+            internalformat="RGB32F" format="RGB" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <elevationProducer name="groundElevations1" cache="groundElevations"
+        noise="-3250,-1590,-1125,-795,-561,-397,-140,-100,15,8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+    <elevationProducer name="groundElevations2" cache="groundElevations"
+        noise="-3250,-1590,-1125,-795,-561,-397,-140,-100,15,8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+    <elevationProducer name="groundElevations3" cache="groundElevations"
+        noise="-3250,-1590,-1125,-795,-561,-397,-140,-100,15,8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+    <elevationProducer name="groundElevations4" cache="groundElevations"
+        noise="-3250,-1590,-1125,-795,-561,-397,-140,-100,15,8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+    <elevationProducer name="groundElevations5" cache="groundElevations"
+        noise="-3250,-1590,-1125,-795,-561,-397,-140,-100,15,8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+    <elevationProducer name="groundElevations6" cache="groundElevations"
+        noise="-3250,-1590,-1125,-795,-561,-397,-140,-100,15,8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+
+    <tileCache name="groundNormals" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="97" nTiles="1296"
+            internalformat="RG8" format="RG" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <normalProducer name="groundNormals1" cache="groundNormals" elevations="groundElevations1" deform="sphere"/>
+    <normalProducer name="groundNormals2" cache="groundNormals" elevations="groundElevations2" deform="sphere"/>
+    <normalProducer name="groundNormals3" cache="groundNormals" elevations="groundElevations3" deform="sphere"/>
+    <normalProducer name="groundNormals4" cache="groundNormals" elevations="groundElevations4" deform="sphere"/>
+    <normalProducer name="groundNormals5" cache="groundNormals" elevations="groundElevations5" deform="sphere"/>
+    <normalProducer name="groundNormals6" cache="groundNormals" elevations="groundElevations6" deform="sphere"/>
+
+    <!-- --------------- GROUND NODES --------------- -->
+
+    <terrainNode name="earth1" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="20"/>
+    <terrainNode name="earth2" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="20"/>
+    <terrainNode name="earth3" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="20"/>
+    <terrainNode name="earth4" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="20"/>
+    <terrainNode name="earth5" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="20"/>
+    <terrainNode name="earth6" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="20"/>
+
+    <!-- --------------- SCENE --------------- -->
+
+    <node name="scene">
+        <node flags="camera">
+            <method id="draw" value="cameraMethod"/>
+            <module id="globals" value="globalsShaderFS"/>
+        </node>
+
+        <node name="sun" flags="light">
+            <translate x="0" y="-1" z="0"/>
+            <method id="draw" value="sunMethod"/>
+        </node>
+
+        <node name="ocean" flags="object">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <method id="draw" value="drawOceanFFTMethod"/>
+            <module id="material" value="oceanFFTShader"/>
+        </node>
+
+        <node name="earth1" flags="object,dynamic">
+            <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+            <field id="terrain" value="earth1"/>
+            <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations1" storeInvisible="false"/>
+            <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals1" storeInvisible="false"/>
+            <mesh id="grid" value="grid25.mesh"/>
+            <method id="update" value="updateTerrainMethod"/>
+            <method id="draw" value="drawTerrainMethod"/>
+            <module id="material" value="fractalplanetShader"/>
+        </node>
+
+        <node name="earth2" flags="object,dynamic">
+            <rotatex angle="90"/>
+            <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+            <field id="terrain" value="earth2"/>
+            <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations2" storeInvisible="false"/>
+            <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals2" storeInvisible="false"/>
+            <mesh id="grid" value="grid25.mesh"/>
+            <method id="update" value="updateTerrainMethod"/>
+            <method id="draw" value="drawTerrainMethod"/>
+            <module id="material" value="fractalplanetShader"/>
+        </node>
+
+        <node name="earth3" flags="object,dynamic">
+            <rotatex angle="90"/>
+            <rotatey angle="90"/>
+            <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+            <field id="terrain" value="earth3"/>
+            <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations3" storeInvisible="false"/>
+            <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals3" storeInvisible="false"/>
+            <mesh id="grid" value="grid25.mesh"/>
+            <method id="update" value="updateTerrainMethod"/>
+            <method id="draw" value="drawTerrainMethod"/>
+            <module id="material" value="fractalplanetShader"/>
+        </node>
+
+        <node name="earth4" flags="object,dynamic">
+            <rotatex angle="90"/>
+            <rotatey angle="180"/>
+            <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+            <field id="terrain" value="earth4"/>
+            <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations4" storeInvisible="false"/>
+            <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals4" storeInvisible="false"/>
+            <mesh id="grid" value="grid25.mesh"/>
+            <method id="update" value="updateTerrainMethod"/>
+            <method id="draw" value="drawTerrainMethod"/>
+            <module id="material" value="fractalplanetShader"/>
+        </node>
+
+        <node name="earth5" flags="object,dynamic">
+            <rotatex angle="90"/>
+            <rotatey angle="270"/>
+            <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+            <field id="terrain" value="earth5"/>
+            <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations5" storeInvisible="false"/>
+            <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals5" storeInvisible="false"/>
+            <mesh id="grid" value="grid25.mesh"/>
+            <method id="update" value="updateTerrainMethod"/>
+            <method id="draw" value="drawTerrainMethod"/>
+            <module id="material" value="fractalplanetShader"/>
+        </node>
+
+        <node name="earth6" flags="object,dynamic">
+            <rotatex angle="180"/>
+            <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+            <field id="terrain" value="earth6"/>
+            <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations6" storeInvisible="false"/>
+            <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals6" storeInvisible="false"/>
+            <mesh id="grid" value="grid25.mesh"/>
+            <method id="update" value="updateTerrainMethod"/>
+            <method id="draw" value="drawTerrainMethod"/>
+            <module id="material" value="fractalplanetShader"/>
+        </node>
+
+        <node name="sky" flags="object">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <mesh id="geometry" value="quad.mesh"/>
+            <method id="draw" value="raycastMethod"/>
+            <module id="material" value="sky1Shader"/>
+        </node>
+
+        <node flags="overlay">
+            <method id="draw" value="drawTweakBarMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="logMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="infoMethod"/>
+        </node>
+    </node>
+
+    <!-- --------------- USER INTERFACE --------------- -->
+
+    <basicViewHandler name="viewHandler" viewManager="window"/>
+
+    <tweakScene name="editScene" scene="scene" active="false"/>
+
+    <tweakBarManager name="tweakBar" next="viewHandler">
+        <editor id="resources" bar="prolandTweakBar" permanent="true" exclusive="false"/>
+        <editor id="view" bar="tweakEarthViews" permanent="true" exclusive="false"/>
+        <editor id="scene" bar="editScene" exclusive="false"/>
+    </tweakBarManager>
+
+    <eventRecorder name="eventRecorder" recorded="window" videoDirectory="video/frame-%.5d.tga" cursorTexture="cursor" next="tweakBar"/>
+
+    <prolandDemo name="window" ui="eventRecorder" view="viewHandler" radius="6360000.0"/>
+
+</archive>

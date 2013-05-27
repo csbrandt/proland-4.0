@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="proland-graph" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\output\bin\proland-graph-4_0d" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\build\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="0" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-mthreads" />
+				</Compiler>
+				<Linker>
+					<Add option="$(#twbar.lib)" />
+					<Add library="$(#pthread)" />
+					<Add library="$(#glu)" />
+					<Add library="ork3d" />
+					<Add library="proland-core-4_0d" />
+					<Add library="proland-terrain-4_0d" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\output\bin\proland-graph-4_0" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\build\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="0" />
+				<Compiler>
+					<Add option="-mthreads" />
+					<Add option="-fno-strict-aliasing" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="$(#twbar.lib)" />
+					<Add library="$(#pthread)" />
+					<Add library="$(#glu)" />
+					<Add library="ork3" />
+					<Add library="proland-core-4_0" />
+					<Add library="proland-terrain-4_0" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-march=i686" />
+			<Add option="-pedantic-errors" />
+			<Add option="-pedantic" />
+			<Add option="-Wall" />
+			<Add option="-ansi" />
+			<Add option="-Wno-long-long" />
+			<Add option="-fno-strict-aliasing" />
+			<Add option="-DPROLAND_API=" />
+			<Add option="-DORK_API=" />
+			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DSTBI_NO_STDIO" />
+			<Add option="-DSTBI_NO_WRITE" />
+			<Add directory="$(#tiff.include)" />
+			<Add directory="$(#ork3.include)" />
+			<Add directory="$(#ork3.extern)" />
+			<Add directory="$(#twbar.include)" />
+			<Add directory="sources" />
+			<Add directory="..\core\sources" />
+			<Add directory="..\terrain\sources" />
+		</Compiler>
+		<Linker>
+			<Add directory="$(#tiff.lib)" />
+			<Add directory="$(#ork3.lib)" />
+			<Add directory="..\output\bin" />
+		</Linker>
+		<Unit filename="sources\proland\GraphPlugin.cpp" />
+		<Unit filename="sources\proland\GraphPlugin.h" />
+		<Unit filename="sources\proland\dem\ElevationCurveData.cpp" />
+		<Unit filename="sources\proland\dem\ElevationCurveData.h" />
+		<Unit filename="sources\proland\dem\ElevationGraphLayer.cpp" />
+		<Unit filename="sources\proland\dem\ElevationGraphLayer.h" />
+		<Unit filename="sources\proland\dem\ElevationMargin.cpp" />
+		<Unit filename="sources\proland\dem\ElevationMargin.h" />
+		<Unit filename="sources\proland\dem\RoadElevationLayer.cpp" />
+		<Unit filename="sources\proland\dem\RoadElevationLayer.h" />
+		<Unit filename="sources\proland\dem\WaterElevationLayer.cpp" />
+		<Unit filename="sources\proland\dem\WaterElevationLayer.h" />
+		<Unit filename="sources\proland\graph\Area.cpp" />
+		<Unit filename="sources\proland\graph\Area.h" />
+		<Unit filename="sources\proland\graph\BasicCurvePart.cpp" />
+		<Unit filename="sources\proland\graph\BasicCurvePart.h" />
+		<Unit filename="sources\proland\graph\BasicGraph.cpp" />
+		<Unit filename="sources\proland\graph\BasicGraph.h" />
+		<Unit filename="sources\proland\graph\ComposedMargin.cpp" />
+		<Unit filename="sources\proland\graph\ComposedMargin.h" />
+		<Unit filename="sources\proland\graph\Curve.cpp" />
+		<Unit filename="sources\proland\graph\Curve.h" />
+		<Unit filename="sources\proland\graph\CurvePart.cpp" />
+		<Unit filename="sources\proland\graph\CurvePart.h" />
+		<Unit filename="sources\proland\graph\FileReader.cpp" />
+		<Unit filename="sources\proland\graph\FileReader.h" />
+		<Unit filename="sources\proland\graph\FileWriter.cpp" />
+		<Unit filename="sources\proland\graph\FileWriter.h" />
+		<Unit filename="sources\proland\graph\Graph.cpp" />
+		<Unit filename="sources\proland\graph\Graph.h" />
+		<Unit filename="sources\proland\graph\GraphListener.cpp" />
+		<Unit filename="sources\proland\graph\GraphListener.h" />
+		<Unit filename="sources\proland\graph\LazyArea.cpp" />
+		<Unit filename="sources\proland\graph\LazyArea.h" />
+		<Unit filename="sources\proland\graph\LazyCurve.cpp" />
+		<Unit filename="sources\proland\graph\LazyCurve.h" />
+		<Unit filename="sources\proland\graph\LazyGraph.cpp" />
+		<Unit filename="sources\proland\graph\LazyGraph.h" />
+		<Unit filename="sources\proland\graph\LazyNode.cpp" />
+		<Unit filename="sources\proland\graph\LazyNode.h" />
+		<Unit filename="sources\proland\graph\LineCurvePart.cpp" />
+		<Unit filename="sources\proland\graph\LineCurvePart.h" />
+		<Unit filename="sources\proland\graph\Margin.cpp" />
+		<Unit filename="sources\proland\graph\Margin.h" />
+		<Unit filename="sources\proland\graph\Node.cpp" />
+		<Unit filename="sources\proland\graph\Node.h" />
+		<Unit filename="sources\proland\graph\producer\CurveData.cpp" />
+		<Unit filename="sources\proland\graph\producer\CurveData.h" />
+		<Unit filename="sources\proland\graph\producer\CurveDataFactory.cpp" />
+		<Unit filename="sources\proland\graph\producer\CurveDataFactory.h" />
+		<Unit filename="sources\proland\graph\producer\GetCurveDatasTask.h" />
+		<Unit filename="sources\proland\graph\producer\GraphLayer.cpp" />
+		<Unit filename="sources\proland\graph\producer\GraphLayer.h" />
+		<Unit filename="sources\proland\graph\producer\GraphProducer.cpp" />
+		<Unit filename="sources\proland\graph\producer\GraphProducer.h" />
+		<Unit filename="sources\proland\graph\producer\Tesselator.cpp" />
+		<Unit filename="sources\proland\graph\producer\Tesselator.h" />
+		<Unit filename="sources\proland\ortho\FieldsOrthoLayer.cpp" />
+		<Unit filename="sources\proland\ortho\FieldsOrthoLayer.h" />
+		<Unit filename="sources\proland\ortho\ForestOrthoLayer.cpp" />
+		<Unit filename="sources\proland\ortho\ForestOrthoLayer.h" />
+		<Unit filename="sources\proland\ortho\LineOrthoLayer.cpp" />
+		<Unit filename="sources\proland\ortho\LineOrthoLayer.h" />
+		<Unit filename="sources\proland\ortho\MaskOrthoLayer.cpp" />
+		<Unit filename="sources\proland\ortho\MaskOrthoLayer.h" />
+		<Unit filename="sources\proland\ortho\OrthoMargin.cpp" />
+		<Unit filename="sources\proland\ortho\OrthoMargin.h" />
+		<Unit filename="sources\proland\ortho\RoadOrthoLayer.cpp" />
+		<Unit filename="sources\proland\ortho\RoadOrthoLayer.h" />
+		<Unit filename="sources\proland\ortho\WaterOrthoLayer.cpp" />
+		<Unit filename="sources\proland\ortho\WaterOrthoLayer.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

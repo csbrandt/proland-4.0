@@ -1,0 +1,53 @@
+REQUIREMENTS
+------------------------------------------------------------------------------
+
+Proland requires the latest driver for your graphics card, providing support for
+OpenGL 3.3.
+
+Proland also requires the following external libraries (make sure to include 
+them in your path environment variable):
+- Ork (latest SVN version at http://ork.gforge.inria.fr/), which itself requires
+  - glew-1.5.6
+  - pthreads-2.8.0 (only for the task graph and scene graph frameworks)
+  - glut or freeglut (only for the GlutWindow class)
+- libtiff-3.6
+- AntTweakBar-1.14
+
+INSTALLATION WITH PROJECT FILES
+------------------------------------------------------------------------------
+
+Proland comes with many project files for Code::Blocks. 
+There is one project file per plugin, plus one project file per example
+and exercise.
+
+For the Code::Blocks projects you need to define the following global compiler
+variables:
+- glu (base) : either glu32 or glu
+- glut (base) : either glut32 or freeglut 
+- glut (cflags) : either USE_GLUT or USE_FREEGLUT
+- glew : the path to the glew DLL, e.g. C:\Progra~1\glew\glew32.dll
+- tiff (base) : the path to the libtiff directory (must contain include, lib
+and bin include sub-directories)
+- twbar (base) : the path to the AntTweakBar directory (must contain include
+and lib sub-directories)
+- twbar (lib) : the path to the AntTweakBar.lib file
+- pthread (base) : either pthreadGCE2 or pthread
+- ork3 (base) : the path to the Ork library (the one containing the doc,
+examples, libraries, ork and test sub-directories)
+- ork3 (include) : same as above
+- ork3 (lib) : the path to the Ork bin subdirectory
+- ork3 (extern) : the path to the Ork libraries subdirectory
+
+You also need to set the "Explicitly add project's top-level directory to 
+compiler search dirs" options in "Global compiler settings/Other settings"
+
+DEMO
+------------------------------------------------------------------------------
+
+The demo examples can be run with the proland-demo Code::Blocks project.
+There is only one program, which can run any of the example scenes in the
+"archives" directory. To launch one example, set the program's arguments
+to "<scene> <data>" where <scene> is any path to a file in the "archives"
+(e.g. "earth/earth.xml", "fractal/fractalterrain.xml", etc) and where
+<data> is the path where the .DAT files are stored (you can download them
+from <TODO>).

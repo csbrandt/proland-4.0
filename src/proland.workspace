@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_workspace_file>
+	<Workspace title="Proland">
+		<Project filename="core/proland-core.cbp" />
+		<Project filename="terrain/proland-terrain.cbp">
+			<Depends filename="core/proland-core.cbp" />
+		</Project>
+		<Project filename="graph/proland-graph.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="river/proland-river.cbp">
+			<Depends filename="graph/proland-graph.cbp" />
+		</Project>
+		<Project filename="edit/proland-edit.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+			<Depends filename="graph/proland-graph.cbp" />
+			<Depends filename="river/proland-river.cbp" />
+		</Project>
+		<Project filename="atmo/proland-atmo.cbp" />
+		<Project filename="ocean/proland-ocean.cbp">
+			<Depends filename="core/proland-core.cbp" />
+		</Project>
+		<Project filename="forest/proland-forest.cbp">
+			<Depends filename="core/proland-core.cbp" />
+		</Project>
+		<Project filename="core/examples/helloworld/helloworld.cbp">
+			<Depends filename="core/proland-core.cbp" />
+		</Project>
+		<Project filename="terrain/examples/terrain1/helloworld.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="terrain/examples/terrain2/helloworld.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="terrain/examples/terrain3/helloworld.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="terrain/examples/terrain4/helloworld.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="terrain/examples/terrain5/helloworld.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="terrain/examples/preprocess/helloworld.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="graph/examples/graph1/helloworld.cbp">
+			<Depends filename="terrain/proland-terrain.cbp" />
+			<Depends filename="graph/proland-graph.cbp" />
+		</Project>
+		<Project filename="river/examples/river1/helloworld.cbp">
+			<Depends filename="river/proland-river.cbp" />
+		</Project>
+		<Project filename="edit/examples/edit1/helloworld.cbp">
+			<Depends filename="forest/proland-forest.cbp" />
+		</Project>
+		<Project filename="edit/examples/edit2/helloworld.cbp">
+			<Depends filename="edit/proland-edit.cbp" />
+		</Project>
+		<Project filename="edit/examples/edit3/helloworld.cbp">
+			<Depends filename="edit/proland-edit.cbp" />
+		</Project>
+		<Project filename="edit/examples/edit4/helloworld.cbp" />
+		<Project filename="atmo/examples/atmo/helloworld.cbp">
+			<Depends filename="core/proland-core.cbp" />
+			<Depends filename="atmo/proland-atmo.cbp" />
+		</Project>
+		<Project filename="ocean/examples/ocean1/helloworld.cbp">
+			<Depends filename="atmo/proland-atmo.cbp" />
+			<Depends filename="ocean/proland-ocean.cbp" />
+		</Project>
+		<Project filename="ocean/examples/ocean2/helloworld.cbp" />
+		<Project filename="forest/examples/trees1/helloworld.cbp" />
+		<Project filename="demo/proland-demo.cbp">
+			<Depends filename="core/proland-core.cbp" />
+			<Depends filename="terrain/proland-terrain.cbp" />
+			<Depends filename="edit/proland-edit.cbp" />
+			<Depends filename="atmo/proland-atmo.cbp" />
+			<Depends filename="ocean/proland-ocean.cbp" />
+			<Depends filename="forest/proland-forest.cbp" />
+		</Project>
+		<Project filename="terrain/examples/exercise1/helloworld.cbp">
+			<Depends filename="core/proland-core.cbp" />
+			<Depends filename="terrain/proland-terrain.cbp" />
+			<Depends filename="atmo/proland-atmo.cbp" />
+			<Depends filename="ocean/proland-ocean.cbp" />
+		</Project>
+		<Project filename="terrain/examples/exercise2/helloworld.cbp">
+			<Depends filename="core/proland-core.cbp" />
+			<Depends filename="terrain/proland-terrain.cbp" />
+			<Depends filename="edit/proland-edit.cbp" />
+			<Depends filename="forest/proland-forest.cbp" />
+		</Project>
+		<Project filename="terrain/examples/exercise3/helloworld.cbp">
+			<Depends filename="core/proland-core.cbp" />
+			<Depends filename="terrain/proland-terrain.cbp" />
+		</Project>
+		<Project filename="terrain/examples/exercise4/helloworld.cbp" />
+		<Project filename="terrain/examples/exercise5/helloworld.cbp" />
+		<Project filename="proland.cbp" active="1">
+			<Depends filename="core/proland-core.cbp" />
+			<Depends filename="terrain/proland-terrain.cbp" />
+			<Depends filename="graph/proland-graph.cbp" />
+			<Depends filename="river/proland-river.cbp" />
+			<Depends filename="edit/proland-edit.cbp" />
+			<Depends filename="atmo/proland-atmo.cbp" />
+			<Depends filename="ocean/proland-ocean.cbp" />
+			<Depends filename="forest/proland-forest.cbp" />
+			<Depends filename="core/examples/helloworld/helloworld.cbp" />
+			<Depends filename="terrain/examples/terrain1/helloworld.cbp" />
+			<Depends filename="terrain/examples/terrain2/helloworld.cbp" />
+			<Depends filename="terrain/examples/terrain3/helloworld.cbp" />
+			<Depends filename="terrain/examples/terrain4/helloworld.cbp" />
+			<Depends filename="terrain/examples/terrain5/helloworld.cbp" />
+			<Depends filename="terrain/examples/preprocess/helloworld.cbp" />
+			<Depends filename="graph/examples/graph1/helloworld.cbp" />
+			<Depends filename="river/examples/river1/helloworld.cbp" />
+			<Depends filename="edit/examples/edit1/helloworld.cbp" />
+			<Depends filename="edit/examples/edit2/helloworld.cbp" />
+			<Depends filename="edit/examples/edit3/helloworld.cbp" />
+			<Depends filename="edit/examples/edit4/helloworld.cbp" />
+			<Depends filename="atmo/examples/atmo/helloworld.cbp" />
+			<Depends filename="ocean/examples/ocean1/helloworld.cbp" />
+			<Depends filename="ocean/examples/ocean2/helloworld.cbp" />
+			<Depends filename="forest/examples/trees1/helloworld.cbp" />
+			<Depends filename="demo/proland-demo.cbp" />
+			<Depends filename="terrain/examples/exercise1/helloworld.cbp" />
+			<Depends filename="terrain/examples/exercise2/helloworld.cbp" />
+			<Depends filename="terrain/examples/exercise3/helloworld.cbp" />
+			<Depends filename="terrain/examples/exercise4/helloworld.cbp" />
+			<Depends filename="terrain/examples/exercise5/helloworld.cbp" />
+		</Project>
+	</Workspace>
+</CodeBlocks_workspace_file>

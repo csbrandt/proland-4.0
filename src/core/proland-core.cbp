@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="proland-core" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\output\bin\proland-core-4_0d" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\build\Debug\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="0" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-mthreads" />
+				</Compiler>
+				<Linker>
+					<Add option="$(#twbar.lib)" />
+					<Add library="$(#pthread)" />
+					<Add library="ork3d" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\output\bin\proland-core-4_0" prefix_auto="1" extension_auto="1" />
+				<Option object_output="..\build\Release\" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createStaticLib="0" />
+				<Compiler>
+					<Add option="-mthreads" />
+					<Add option="-fno-strict-aliasing" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+					<Add option="$(#twbar.lib)" />
+					<Add library="$(#pthread)" />
+					<Add library="ork3" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-march=i686" />
+			<Add option="-pedantic-errors" />
+			<Add option="-pedantic" />
+			<Add option="-Wall" />
+			<Add option="-ansi" />
+			<Add option="-Wno-long-long" />
+			<Add option="-fno-strict-aliasing" />
+			<Add option="-DPROLAND_API=" />
+			<Add option="-DORK_API=" />
+			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DSTBI_NO_STDIO" />
+			<Add option="-DSTBI_NO_WRITE" />
+			<Add directory="$(#tiff.include)" />
+			<Add directory="$(#ork3.include)" />
+			<Add directory="$(#ork3.extern)" />
+			<Add directory="$(#twbar.include)" />
+			<Add directory="sources" />
+		</Compiler>
+		<Linker>
+			<Add library="tiff" />
+			<Add directory="$(#tiff.lib)" />
+			<Add directory="$(#ork3.lib)" />
+			<Add directory="..\output\bin" />
+		</Linker>
+		<Unit filename="sources\proland\math\color.cpp" />
+		<Unit filename="sources\proland\math\color.h" />
+		<Unit filename="sources\proland\math\geometry.h" />
+		<Unit filename="sources\proland\math\noise.cpp" />
+		<Unit filename="sources\proland\math\noise.h" />
+		<Unit filename="sources\proland\math\seg2.h" />
+		<Unit filename="sources\proland\particles\LifeCycleParticleLayer.cpp" />
+		<Unit filename="sources\proland\particles\LifeCycleParticleLayer.h" />
+		<Unit filename="sources\proland\particles\ParticleLayer.cpp" />
+		<Unit filename="sources\proland\particles\ParticleLayer.h" />
+		<Unit filename="sources\proland\particles\ParticleProducer.cpp" />
+		<Unit filename="sources\proland\particles\ParticleProducer.h" />
+		<Unit filename="sources\proland\particles\ParticleStorage.cpp" />
+		<Unit filename="sources\proland\particles\ParticleStorage.h" />
+		<Unit filename="sources\proland\particles\RandomParticleLayer.cpp" />
+		<Unit filename="sources\proland\particles\RandomParticleLayer.h" />
+		<Unit filename="sources\proland\particles\WorldParticleLayer.cpp" />
+		<Unit filename="sources\proland\particles\WorldParticleLayer.h" />
+		<Unit filename="sources\proland\particles\screen\ParticleGrid.cpp" />
+		<Unit filename="sources\proland\particles\screen\ParticleGrid.h" />
+		<Unit filename="sources\proland\particles\screen\ScreenParticleLayer.cpp" />
+		<Unit filename="sources\proland\particles\screen\ScreenParticleLayer.h" />
+		<Unit filename="sources\proland\particles\terrain\FlowTile.cpp" />
+		<Unit filename="sources\proland\particles\terrain\FlowTile.h" />
+		<Unit filename="sources\proland\particles\terrain\TerrainParticleLayer.cpp" />
+		<Unit filename="sources\proland\particles\terrain\TerrainParticleLayer.h" />
+		<Unit filename="sources\proland\producer\CPUTileStorage.cpp" />
+		<Unit filename="sources\proland\producer\CPUTileStorage.h" />
+		<Unit filename="sources\proland\producer\GPUTileStorage.cpp" />
+		<Unit filename="sources\proland\producer\GPUTileStorage.h" />
+		<Unit filename="sources\proland\producer\ObjectTileStorage.cpp" />
+		<Unit filename="sources\proland\producer\ObjectTileStorage.h" />
+		<Unit filename="sources\proland\producer\TileCache.cpp" />
+		<Unit filename="sources\proland\producer\TileCache.h" />
+		<Unit filename="sources\proland\producer\TileLayer.cpp" />
+		<Unit filename="sources\proland\producer\TileLayer.h" />
+		<Unit filename="sources\proland\producer\TileProducer.cpp" />
+		<Unit filename="sources\proland\producer\TileProducer.h" />
+		<Unit filename="sources\proland\producer\TileStorage.cpp" />
+		<Unit filename="sources\proland\producer\TileStorage.h" />
+		<Unit filename="sources\proland\terrain\CylindricalDeformation.cpp" />
+		<Unit filename="sources\proland\terrain\CylindricalDeformation.h" />
+		<Unit filename="sources\proland\terrain\Deformation.cpp" />
+		<Unit filename="sources\proland\terrain\Deformation.h" />
+		<Unit filename="sources\proland\terrain\DrawTerrainTask.cpp" />
+		<Unit filename="sources\proland\terrain\DrawTerrainTask.h" />
+		<Unit filename="sources\proland\terrain\ReadbackManager.cpp" />
+		<Unit filename="sources\proland\terrain\ReadbackManager.h" />
+		<Unit filename="sources\proland\terrain\SphericalDeformation.cpp" />
+		<Unit filename="sources\proland\terrain\SphericalDeformation.h" />
+		<Unit filename="sources\proland\terrain\TerrainNode.cpp" />
+		<Unit filename="sources\proland\terrain\TerrainNode.h" />
+		<Unit filename="sources\proland\terrain\TerrainQuad.cpp" />
+		<Unit filename="sources\proland\terrain\TerrainQuad.h" />
+		<Unit filename="sources\proland\terrain\TileSampler.cpp" />
+		<Unit filename="sources\proland\terrain\TileSampler.h" />
+		<Unit filename="sources\proland\terrain\TileSamplerZ.cpp" />
+		<Unit filename="sources\proland\terrain\TileSamplerZ.h" />
+		<Unit filename="sources\proland\terrain\UpdateTerrainTask.cpp" />
+		<Unit filename="sources\proland\terrain\UpdateTerrainTask.h" />
+		<Unit filename="sources\proland\terrain\UpdateTileSamplersTask.cpp" />
+		<Unit filename="sources\proland\terrain\UpdateTileSamplersTask.h" />
+		<Unit filename="sources\proland\ui\BasicViewHandler.cpp" />
+		<Unit filename="sources\proland\ui\BasicViewHandler.h" />
+		<Unit filename="sources\proland\ui\EventRecorder.cpp" />
+		<Unit filename="sources\proland\ui\EventRecorder.h" />
+		<Unit filename="sources\proland\ui\MousePositionHandler.cpp" />
+		<Unit filename="sources\proland\ui\MousePositionHandler.h" />
+		<Unit filename="sources\proland\ui\SceneVisitor.cpp" />
+		<Unit filename="sources\proland\ui\SceneVisitor.h" />
+		<Unit filename="sources\proland\ui\twbar\DrawTweakBarTask.cpp" />
+		<Unit filename="sources\proland\ui\twbar\DrawTweakBarTask.h" />
+		<Unit filename="sources\proland\ui\twbar\TweakBarHandler.cpp" />
+		<Unit filename="sources\proland\ui\twbar\TweakBarHandler.h" />
+		<Unit filename="sources\proland\ui\twbar\TweakBarManager.cpp" />
+		<Unit filename="sources\proland\ui\twbar\TweakBarManager.h" />
+		<Unit filename="sources\proland\ui\twbar\TweakResource.cpp" />
+		<Unit filename="sources\proland\ui\twbar\TweakResource.h" />
+		<Unit filename="sources\proland\ui\twbar\TweakSceneGraph.cpp" />
+		<Unit filename="sources\proland\ui\twbar\TweakSceneGraph.h" />
+		<Unit filename="sources\proland\ui\twbar\TweakViewHandler.cpp" />
+		<Unit filename="sources\proland\ui\twbar\TweakViewHandler.h" />
+		<Unit filename="sources\proland\util\CylinderViewController.cpp" />
+		<Unit filename="sources\proland\util\CylinderViewController.h" />
+		<Unit filename="sources\proland\util\PlanetViewController.cpp" />
+		<Unit filename="sources\proland\util\PlanetViewController.h" />
+		<Unit filename="sources\proland\util\TerrainViewController.cpp" />
+		<Unit filename="sources\proland\util\TerrainViewController.h" />
+		<Unit filename="sources\proland\util\mfs.cpp" />
+		<Unit filename="sources\proland\util\mfs.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

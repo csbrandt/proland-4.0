@@ -1,0 +1,638 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   viewBox="0 0 455 225"
+   style="width:100%; height:100%;" preserveAspectRatio="xMidYMid slice"
+   id="svg2">
+  <defs
+     id="defs4">
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutS"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.2,0.2)"
+         id="path5458"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInS"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(-0.2,-0.2)"
+         id="path5467"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutM"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path5461"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInM"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(-0.4,-0.4)"
+         id="path5470"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInMf"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(-0.4,-0.4)"
+         id="path6634"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMe"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path6637"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMU"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path7817"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInMfK"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(-0.4,-0.4)"
+         id="path12474"
+         style="fill:#0000ff;fill-rule:evenodd;stroke:#0000ff;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMew"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path12477"
+         style="fill:#0000ff;fill-rule:evenodd;stroke:#0000ff;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMUv"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path13704"
+         style="fill:#0000ff;fill-rule:evenodd;stroke:#0000ff;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInMfR"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(-0.4,-0.4)"
+         id="path14937"
+         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMey"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path14940"
+         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMUj"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path16177"
+         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutM-9"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path5461-4"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInM-8"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(-0.4,-0.4)"
+         id="path5470-8"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker2956"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path2958"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <path
+       d="M 275,85 440,20"
+       id="path18373"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#TriangleInM);marker-end:url(#TriangleOutM)" />
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker2961"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(-0.4,-0.4)"
+         id="path2963"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="marker2965"
+       style="overflow:visible">
+      <path
+         d="m 5.77,0 -8.65,5 0,-10 8.65,5 z"
+         transform="scale(0.4,0.4)"
+         id="path2967"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+  </defs>
+  <g
+     transform="translate(-30,-533.18896)"
+     id="layer1">
+    <rect
+       width="455"
+       height="225"
+       x="30"
+       y="533.18896"
+       id="rect3175"
+       style="fill:#f9f9f9;fill-opacity:1;stroke:none" />
+    <rect
+       width="0"
+       height="2.0203052"
+       x="330"
+       y="139.18428"
+       id="rect2168"
+       style="fill:#32d9f5;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    <path
+       d="m 105,563.43896 -30,0 0,50 5,0 0,-25 15,0 0,-5 -15,0 0,-15 25,0 0,-5 z"
+       id="path15349"
+       style="fill:#ff0000;fill-opacity:1;fill-rule:evenodd;stroke:none" />
+    <g
+       transform="translate(-200,525.82678)"
+       id="g15351">
+      <rect
+         width="79.947365"
+         height="79.971046"
+         x="250"
+         y="32.362186"
+         id="rect15353"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+      <path
+         d="m 290,32.362187 0,79.999993"
+         id="path15355"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         d="m 250,72.362187 80,0"
+         id="path15357"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         d="m 250,52.362187 80,0"
+         id="path15359"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         d="m 330,92.362187 -80,0"
+         id="path15361"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         d="m 270,112.36218 0,-79.999993"
+         id="path15363"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         d="m 310,32.362187 0,79.999993"
+         id="path15365"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       d="m 75,553.18896 10,40 -40,-10"
+       id="path15387"
+       style="fill:#008080;fill-opacity:0.70183488;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <text
+       x="50"
+       y="658.18896"
+       id="text16358"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#008080;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="50"
+         y="658.18896"
+         id="tspan16360">view frustum</tspan></text>
+    <text
+       x="180"
+       y="668.18896"
+       id="text22292"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="180"
+         y="668.18896"
+         id="tspan22294">TileCache</tspan></text>
+    <text
+       x="150"
+       y="563.18896"
+       id="text22304"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="150"
+         y="563.18896"
+         id="tspan22306">l,tx,ty</tspan></text>
+    <text
+       x="250"
+       y="563.18896"
+       id="text22312"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="250"
+         y="563.18896"
+         id="tspan22314">used</tspan></text>
+    <text
+       x="150"
+       y="583.18896"
+       id="text22316"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="150"
+         y="583.18896"
+         id="tspan22318">2,1,1</tspan><tspan
+         x="150"
+         y="598.18896"
+         id="tspan22339">2,1,2</tspan><tspan
+         x="150"
+         y="613.18896"
+         id="tspan22341">2,1,3</tspan><tspan
+         x="150"
+         y="628.18896"
+         id="tspan22343">2,2,2</tspan><tspan
+         x="150"
+         y="643.18896"
+         id="tspan22345">2,2,3</tspan></text>
+    <rect
+       width="139.5"
+       height="100"
+       x="145"
+       y="548.18896"
+       id="rect22359"
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    <path
+       d="m 145.01654,568.18896 139.46691,0"
+       id="path23330"
+       style="fill:none;stroke:#000000;stroke-width:0.99999994px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       d="m 190,548.18896 0,100"
+       id="path23332"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <path
+       d="m 245,548.18896 0,100"
+       id="path23334"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    <text
+       x="249.72461"
+       y="583.01904"
+       id="text23338"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="249.72461"
+         y="583.01904"
+         id="tspan23340">false</tspan><tspan
+         x="249.72461"
+         y="598.01904"
+         id="tspan23342">true</tspan><tspan
+         x="249.72461"
+         y="613.01904"
+         id="tspan23344">true</tspan><tspan
+         x="249.72461"
+         y="628.01904"
+         id="tspan23346">false</tspan><tspan
+         x="249.72461"
+         y="643.01904"
+         id="tspan23348">false</tspan></text>
+    <text
+       x="150"
+       y="683.18896"
+       id="text23350"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="150"
+         y="683.18896"
+         id="tspan23352">(hash table on CPU)</tspan></text>
+    <text
+       x="354"
+       y="668.18896"
+       id="text16409"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="354"
+         y="668.18896"
+         id="tspan16411">TileStorage</tspan></text>
+    <path
+       d="m 305,618.18896 165,-65"
+       id="path2971"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#TriangleInM);marker-end:url(#TriangleOutM)" />
+    <text
+       x="123.9678"
+       y="682.16858"
+       transform="matrix(0.93387311,-0.35760456,0.35760456,0.93387311,0,0)"
+       id="text18375"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+   id="tspan18377">nTiles=7</tspan></text>
+    <path
+       d="m 380,633.18896 20,0"
+       id="path18379"
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;marker-start:url(#TriangleInM);marker-end:url(#TriangleOutM)" />
+    <text
+       x="375"
+       y="648.18896"
+       id="text18381"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="375"
+         y="648.18896"
+         id="tspan18383">tileSize=8 pixels</tspan></text>
+    <g
+       transform="translate(35,598.18896)"
+       id="g2963">
+      <path
+         d="m 280,30 0,15 -5,0 0,-15 5,0 z"
+         id="path18387"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none" />
+      <rect
+         width="20"
+         height="20"
+         x="270"
+         y="30"
+         id="rect19375"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <text
+       x="435"
+       y="628.18896"
+       id="text20348"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="435"
+         y="628.18896"
+         id="tspan20350">free slot</tspan></text>
+    <path
+       d="m 455,618.18896 -10,-15"
+       id="path20352"
+       style="fill:none;stroke:#000000;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:1, 1;stroke-dashoffset:0;marker-end:url(#TriangleOutM)" />
+    <text
+       x="320"
+       y="683.18896"
+       id="text23354"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="320"
+         y="683.18896"
+         id="tspan23356">(2D array texture on GPU)</tspan></text>
+    <g
+       transform="translate(40,588.18896)"
+       id="g2967">
+      <path
+         d="m 300,35 0,15 -5,0 0,-15 5,0 z"
+         id="path18385"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none" />
+      <path
+         d="m 310,35 0,5 -15,0 0,-5 15,0 z"
+         id="path18389"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none" />
+      <rect
+         width="20"
+         height="20"
+         x="290"
+         y="30"
+         id="rect19375-1"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       transform="translate(70,568.18896)"
+       id="g2972">
+      <path
+         d="m 330,35 0,5 -15,0 0,-5 15,0 z"
+         id="path18393"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none" />
+      <path
+         d="m 320,30 0,20 -5,0 0,-20 5,0 z"
+         id="path18395"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none" />
+      <rect
+         width="20"
+         height="20"
+         x="310"
+         y="30"
+         id="rect19375-1-1"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       transform="translate(85,558.18896)"
+       id="g2977">
+      <path
+         d="m 285,55 0,5 -15,0 0,-5 15,0 z"
+         id="path18391"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none" />
+      <rect
+         width="20"
+         height="20"
+         x="270"
+         y="50"
+         id="rect19375-1-4"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       transform="translate(115,538.18896)"
+       id="g2981">
+      <path
+         d="m 295,55 0,5 -5,0 0,-5 5,0 z"
+         id="path18397"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:none" />
+      <rect
+         width="20"
+         height="20"
+         x="290"
+         y="50"
+         id="rect19375-1-9"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       transform="translate(115,523.18896)"
+       id="g2985">
+      <path
+         d="m 335,55 0,20 -20,0 0,-20 20,0 z"
+         id="path18399"
+         style="fill:#cccccc;fill-rule:evenodd;stroke:none" />
+      <rect
+         width="20"
+         height="20"
+         x="315"
+         y="55"
+         id="rect19375-1-8"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <g
+       transform="translate(140,513.18896)"
+       id="g2985-4">
+      <path
+         d="m 335,55 0,20 -20,0 0,-20 20,0 z"
+         id="path18399-5"
+         style="fill:#cccccc;fill-rule:evenodd;stroke:none" />
+      <rect
+         width="20"
+         height="20"
+         x="315"
+         y="55"
+         id="rect19375-1-8-5"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;stroke-dashoffset:0" />
+    </g>
+    <text
+       x="138.86914"
+       y="710.69287"
+       id="text22296"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="138.86914"
+         y="710.69287"
+         id="tspan22298">l,tx,ty: logical coordinates</tspan><tspan
+         x="138.86914"
+         y="725.69287"
+         id="tspan23336">layer: storage coordinates</tspan><tspan
+         x="138.86914"
+         y="740.69287"
+         id="tspan23358">used: in view frustum</tspan></text>
+    <text
+       x="195"
+       y="563.18896"
+       id="text22308"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="195"
+         y="563.18896"
+         id="tspan22310">layer</tspan></text>
+    <text
+       x="195"
+       y="583.18896"
+       id="text22347"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;text-align:start;line-height:129.99999523%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="195"
+         y="583.18896"
+         id="tspan3048">0</tspan></text>
+    <text
+       x="195"
+       y="598.18896"
+       id="text22347-1"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;text-align:start;line-height:129.99999523%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="195"
+         y="598.18896"
+         id="tspan3048-7">3</tspan></text>
+    <text
+       x="195"
+       y="613.18896"
+       id="text22347-15"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;text-align:start;line-height:129.99999523%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="195"
+         y="613.18896"
+         id="tspan3048-2">1</tspan></text>
+    <text
+       x="195"
+       y="628.18896"
+       id="text22347-6"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;text-align:start;line-height:129.99999523%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="195"
+         y="628.18896"
+         id="tspan3048-1">4</tspan></text>
+    <text
+       x="195"
+       y="643.18896"
+       id="text22347-2"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;text-align:start;line-height:129.99999523%;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Bitstream Vera Sans"><tspan
+         x="195"
+         y="643.18896"
+         id="tspan3048-3">2</tspan></text>
+  </g>
+</svg>

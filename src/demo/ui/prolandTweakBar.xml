@@ -1,0 +1,91 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<tweakBar label="Options">
+
+    <enum label="Overlays" key="o" group="Debug" help="Show or hide overlays (FPS, logs, tweak bars, etc)" files="cameraMethod.xml">
+        <item label="OFF"><![CDATA[    <!--foreach var="o" flag="overlay">
+        <callMethod name="$o.draw"/>
+    </foreach-->]]></item>
+        <item label="ON"><![CDATA[    <foreach var="o" flag="overlay">
+        <callMethod name="$o.draw"/>
+    </foreach>]]></item>
+    </enum>
+
+    <enum label="Quadtree" key="q" group="Debug" help="Show or hide terrain quadtree" files="textureTile.glsl">
+        <item label="OFF">#define QUADTREE_OFF</item>
+        <item label="ON">#define QUADTREE_ON</item>
+    </enum>
+
+    <enum label="Deform" key="p" group="Debug" help="Enable or disable terrain deformations" files="earthShader.glsl">
+        <item label="OFF">#define CUBE_PROJECTION</item>
+        <item label="ON">#define SPHERE_PROJECTION</item>
+    </enum>
+
+    <enum label="Update" key="u" group="Debug" help="Enable or disable terrain quadtree updates" files="cameraMethod.xml">
+        <item label="OFF"><![CDATA[<!--foreach var="o" flag="dynamic" parallel="true">
+        <callMethod name="$o.update"/>
+    </foreach-->]]></item>
+        <item label="ON"><![CDATA[    <foreach var="o" flag="dynamic" parallel="true">
+        <callMethod name="$o.update"/>
+    </foreach>]]></item>
+    </enum>
+
+    <enum label="Grid" key="g" group="Debug" help="Enable or disable wireframe rendering" files="cameraMethod.xml">
+        <item label="OFF"><![CDATA[    <setState>
+        <polygon front="FILL" back="CULL"/>
+    </setState>]]></item>
+        <item label="ON"><![CDATA[    <setState>
+        <polygon front="LINE" back="CULL"/>
+    </setState>]]></item>
+    </enum>
+
+    <enum label="Atmosphere" key="a" group="Rendering" help="Choose atmospheric rendering options" files="atmosphereShader.glsl">
+        <item label="OFF">#define ATMO_NONE</item>
+        <item label="SUN_ONLY">#define ATMO_SUN_ONLY</item>
+        <item label="SKY_ONLY">#define ATMO_SKY_ONLY</item>
+        <item label="INSCATTER_ONLY">#define ATMO_INSCATTER_ONLY</item>
+        <item label="ON">#define ATMO_FULL</item>
+    </enum>
+
+    <float label="Exposure" keyincr="+" keydecr="-" group="Rendering" help="Choose exposure factor for tone mapping" min="0.01" max="10.0" step="0.01"
+        path="camera/globals/hdrExposure"/>
+
+    <float label="Height1" group="Trees" min="0.01" max="10.0" step="0.01"
+        path="camera/globals/treeHeight1"/>
+
+    <float label="Base1" group="Trees" min="0.01" max="2.0" step="0.01"
+        path="camera/globals/treeBase1"/>
+
+    <float label="Height2" group="Trees" min="0.01" max="10.0" step="0.01"
+        path="camera/globals/treeHeight2"/>
+
+    <float label="Base2" group="Trees" min="0.01" max="2.0" step="0.01"
+        path="camera/globals/treeBase2"/>
+
+    <float label="Density" group="Trees" min="0.01" max="1.0" step="0.01"
+        path="camera/globals/treeDensity"/>
+
+</tweakBar>

@@ -1,0 +1,57 @@
+/*! \page page-examples Examples
+
+\htmlonly
+<div class="mainpage">
+\endhtmlonly
+
+\section sec-atmo Atmo example
+
+\htmlonly
+<img src="atmo.png"><br/>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html atmo.png
+\htmlonly --> \endhtmlonly
+
+This example is based on the paper "Precomputed Atmospheric Scattering", 
+Eric Bruneton and Fabrice Neyret, EGSR 2008, and on the associated source
+code. To use it, launch the application twice: the first launch will
+precompute the atmospheric textures (using the code and shaders in the
+"precompute" sub directory), and the second one will use them to
+render the atmosphere.
+
+The "HelloWorld.cpp" is taken from the "Edit1" example from the edit plugin.
+The scene graph
+organization is also quite simple and should now be quite self explanatory.
+It makes use, in particular, of a globalsShader to hold the shared global
+variables, here the world camera position, the world Sun direction, and
+a camera exposure for tone mapping (see the "Terrain5" example).
+
+This exposure can be changed with the tweak bar, thanks to the following
+resources:
+
+\dontinclude atmo/helloworld.xml
+\skip "settings"
+\until </tweakBarManager
+
+Here the "settings" tweak bar is configured to edit the float uniform
+named "hdrExposure" in the "material" module of the "sky"
+scene node, i.e., in the "skyShader" shader. It also defines min and
+max values for this uniform, shortcut keys to increment and decrement
+it by "step" values, and also associate to it a tweak bar group and
+a help message. You can of course add many more controls like this
+in your applications.
+
+\note the sky shader can work both with flat and spherical terrains.
+For flat terrains, as in this example, you must set the "origin"
+uniform of this shader to (0,0,radius), where radius is the planet
+radius used when precomputing the atmospheric textures (here 6360000):
+
+\dontinclude atmo/helloworld.xml
+\skip skyShader.glsl
+\until </module
+
+For spherical terrains you must set the origin to (0,0,0).
+
+*/

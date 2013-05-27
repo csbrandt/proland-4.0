@@ -1,0 +1,23 @@
+/*! \page page-examples Examples
+
+\htmlonly
+<div class="mainpage">
+\endhtmlonly
+
+\section sec-river1 River1 example
+
+\htmlonly
+<img src="river1.png"><br/>
+\endhtmlonly
+
+\htmlonly <!-- \endhtmlonly
+\image html river1.png
+\htmlonly --> \endhtmlonly
+
+This example is based on the paper "Scalable real-time animation of rivers",
+Qizhi Yu, Fabrice Neyret, Eric Bruneton and Nicolas Holzschuch, Eurographics
+2009.
+
+TODO!
+
+*/

@@ -1,0 +1,211 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<archive>
+    <multithreadScheduler name="defaultScheduler" nthreads="3" fps="0"/>
+
+    <tileCache name="graphCache" scheduler="defaultScheduler">
+        <objectTileStorage capacity="2048"/>
+    </tileCache>
+
+    <hydroGraphFactory name="hydroGraphFactory"/>
+    <graphProducer name="rivers" cache="graphCache" factory="hydroGraphFactory"
+        file="rivers" doFlatten="true"/>
+
+    <tileCache name="groundResiduals" scheduler="defaultScheduler">
+        <cpuFloatTileStorage tileSize="197" channels="1" capacity="1024"/>
+    </tileCache>
+    <residualProducer name="groundResiduals1" cache="groundResiduals"
+        file="DEM.dat" delta="2" scale="0.1"/>
+
+    <tileCache name="groundElevationsCPU" scheduler="defaultScheduler">
+        <cpuFloatTileStorage tileSize="101" channels ="1" capacity="1024"/>
+    </tileCache>
+    <cpuElevationProducer name="groundElevations2" cache="groundElevationsCPU"
+        residuals="groundResiduals1"/>
+
+    <tileCache name="groundElevations" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="101" nTiles="512"
+            internalformat="RGB32F" format="RGB" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <elevationProducer name="groundElevations1" cache="groundElevations"
+            residuals="groundResiduals1">
+        <waterElevationLayer name="waterElevation1" graph="rivers"
+            cpuElevations="groundElevations2" renderProg="waterLayerElevationShader;" fillProg="fillShader;" level="2"/>
+    </elevationProducer>
+
+    <tileCache name="groundNormals" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="97" nTiles="512"
+            internalformat="RG8" format="RG" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <normalProducer name="groundNormals1" cache="groundNormals" elevations="groundElevations1"/>
+
+    <tileCache name="groundOrthoGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="196" nTiles="512"
+            internalformat="RGB8" format="RGB" type="UNSIGNED_BYTE" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"
+            anisotropy="16"/>
+    </tileCache>
+    <orthoGpuProducer name="groundOrthoGpu1" cache="groundOrthoGpu">
+        <emptyOrthoLayer name="background" color="200,200,200"/>
+        <editHydroGraphOrthoLayer name="editGraph1" graphs="rivers" terrain="terrainNode"
+            renderProg="editLayerShader;"/>
+    </orthoGpuProducer>
+
+    <tileCache name="groundRiverMask" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="196" nTiles="512"
+            internalformat="R8" format="RED" type="UNSIGNED_BYTE" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+
+    <orthoGpuProducer name="groundRiverMask1" cache="groundRiverMask">
+        <emptyOrthoLayer name="background" color="0,0,0"/>
+        <maskOrthoLayer name="riverMask" graph="rivers" color="255,0,0" channels="r" renderProg="fillShader;" ignore="1,2,"/>
+    </orthoGpuProducer>
+
+    <tileCache name="hydroCache1" scheduler="defaultScheduler">
+        <objectTileStorage capacity="1024"/>
+    </tileCache>
+    <hydroFlowProducer name="hydro1" cache="hydroCache1" graphs="rivers" displayTileSize="192" slip="1.3" potentialDelta="0.5"/>
+
+    <particleStorage name="particleStorage1" capacity="5000" pack="true"/>
+    <particleProducer name="particles1" storage="particleStorage1">
+        <worldParticleLayer name="worldLayer" speedFactor="5"/>
+        <terrainParticleLayer name="terrainLayer" terrains="terrainNode/riverFlow"/>
+        <screenParticleLayer name="screenLayer" radius="15"/>
+        <lifeCycleParticleLayer name="lifeLayer" fadeInDelay="2" fadeOutDelay="2" activeDelay="30"/>
+        <randomParticleLayer name="randomLayer" xmin="-1" ymin="-1" zmin="-1"/>
+    </particleProducer>
+
+    <sequence name="cameraMethod">
+        <foreach var="o" flag="dynamic" parallel="true">
+            <callMethod name="$o.update"/>
+        </foreach>
+        <foreach var="o" flag="object" culling="true">
+            <callMethod name="$o.draw"/>
+        </foreach>
+        <foreach var="o" flag="overlay">
+            <callMethod name="$o.draw"/>
+        </foreach>
+    </sequence>
+
+    <terrainNode name="terrain" size="500" zmin="0" zmax="500" splitFactor="2" maxLevel="16"/>
+
+    <sequence name="updateTerrainMethod">
+        <updateTerrain name="this.terrain"/>
+        <updateTileSamplers name="this.terrain"/>
+    </sequence>
+
+    <sequence name="drawTerrainMethod">
+        <setProgram>
+            <module name="this.material"/>
+        </setProgram>
+        <drawTerrain name="this.terrain" mesh="this.grid" culling="true"/>
+    </sequence>
+
+    <texture2D name="font" source="text.png" internalformat="R8" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"/>
+
+    <font name="basicFont" tex="font" nRows="8" nCols="12" minChar="32" maxChar="127" invalidChar="63" charWidths="19"/>
+
+    <module name="textShader" version="330" source="textShader.glsl"/>
+
+    <showInfo name="infoMethod" x="4" y="4" maxLines="4" fontSize="24" font="basicFont" fontProgram="textShader;"/>
+
+    <showLog name="logMethod" x="4" y="-4" maxLines="32" fontSize="16" font="basicFont" fontProgram="textShader;"/>
+
+    <drawTweakBar name="drawTweakBarMethod"/>
+
+    <module name="upsampleShader" version="330" source="upsampleShader.glsl"/>
+
+    <module name="waterLayerElevationShader" version="330" source="waterLayerElevationShader.glsl"/>
+
+    <module name="fillShader" version="330" source="fillShader.glsl"/>
+
+    <module name="blendShader" version="330" source="blendShader.glsl"/>
+
+    <module name="upsampleOrthoShader" version="330" source="upsampleOrthoShader.glsl"/>
+
+    <module name="normalShader" version="330" source="normalShader.glsl"/>
+
+    <module name="terrainShader" version="330" source="terrainShader.glsl"/>
+
+    <module name="editLayerShader" version="330" source="editLayerShader.glsl"/>
+
+    <node name="terrainNode" flags="object,dynamic">
+        <bounds xmin="-500" xmax="500" ymin="-500" ymax="500" zmin="-500" zmax="500"/>
+        <field id="terrain" value="terrain"/>
+        <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations1" storeInvisible="false"/>
+        <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals1" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" sampler="orthoSampler" producer="groundOrthoGpu1" storeParent="true" storeInvisible="false"/>
+        <tileSampler id="river" sampler="river.riverSampler" producer="groundRiverMask1" storeParent="false" storeInvisible="false"/>
+        <mesh id="grid" value="quad.mesh"/>
+        <field id="riverGraph" value="rivers"/>
+        <field id="riverFlow" value="hydro1"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="terrainShader"/>
+    </node>
+
+    <updateRivers name="updateRiversMethod" particles="particles1"/>
+
+    <perlinWaveTile name="perlinWaveTile1" samplerName="river.wave"/>
+
+    <drawRivers name="drawRiversMethod" particles="particles1" timeStep="1" drawParticles="true" texture="perlinWaveTile1" waveSlopeFactor="10" waveLength="20" useOffscreenDepthBuffer="false"/>
+
+    <node name="scene">
+        <node flags="camera">
+            <method id="draw" value="cameraMethod"/>
+        </node>
+
+        <node name="terrain" value="terrainNode"/>
+
+        <node name="rivers" flags="object,dynamic">
+            <bounds xmin="-500" xmax="500" ymin="-500" ymax="500" zmin="-500" zmax="500"/>
+            <method id="update" value="updateRiversMethod"/>
+            <method id="draw" value="drawRiversMethod"/>
+        </node>
+
+        <node flags="overlay">
+            <method id="draw" value="drawTweakBarMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="logMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="infoMethod"/>
+        </node>
+    </node>
+
+    <tweakScene name="editScene" scene="scene" active="false"/>
+
+    <tweakHydroGraphLayer name="tweakGraphLayer1" active="true"/>
+
+    <tweakRivers name="tweakRivers1" drawer="drawRiversMethod" active="true"/>
+
+    <tweakBarManager name="ui">
+        <editor id="scene" bar="editScene" exclusive="false"/>
+        <editor id="editor1" bar="tweakGraphLayer1" exclusive="true"/>
+        <editor id="editor2" bar="tweakRivers1" exclusive="false"/>
+    </tweakBarManager>
+
+</archive>

@@ -1,0 +1,17 @@
+/*! \mainpage notitle
+
+\htmlonly
+<div class="mainpage">
+<br/><h1>Proland Documentation - Atmo plugin</h1>
+\endhtmlonly
+
+The Proland atmo plugin provides a static method to precompute
+2D and 3D textures allowing the rendering of atmospheric effects
+in real-time from all viewpoints and for all Sun directions
+(based on the paper "Precomputed Atmospheric Scattering", Eric
+Bruneton and Fabrice Neyret, Eurographics 2008). <i>This plugin
+does not depend on any other plugin</i>.
+
+Look at the "atmo" example to see how to use these textures.
+
+*/

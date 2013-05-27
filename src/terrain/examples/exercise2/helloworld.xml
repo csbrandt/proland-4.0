@@ -1,0 +1,200 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<archive>
+    <multithreadScheduler name="defaultScheduler" nthreads="3" fps="0"/>
+
+    <tileCache name="groundElevations" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="101" nTiles="512"
+            internalformat="RGB32F" format="RGB" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <elevationProducer name="groundElevations1" cache="groundElevations"
+        noise="-140,-100,-15,-8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+
+    <tileCache name="groundNormals" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="97" nTiles="512"
+            internalformat="RG8" format="RG" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <normalProducer name="groundNormals1" cache="groundNormals" elevations="groundElevations1"/>
+
+    <!--tileCache name="groundLccGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="100" nTiles="512"
+            internalformat="R8" format="RED" type="UNSIGNED_BYTE" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <orthoProducer name="groundLccGpu1" cache="groundLccGpu" maxLevel="7"
+        upsampleProg="upsampleLccShader;" cnoise="127.5,0,0,0"
+        noise="0,255,255,255,255,255,255,255">
+        <textureLayer name="slopeFilter1" producer="groundNormals1"
+            renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>
+        <textureLayer name="elevationFilter1" producer="groundElevations1"
+            renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>
+    </orthoProducer-->
+    <tileCache name="groundLccCpu" scheduler="defaultScheduler">
+        <cpuByteTileStorage tileSize="100" channels="1" capacity="1024"/>
+    </tileCache>
+    <editOrthoCpuProducer name="groundLccCpu1" cache="groundLccCpu"/>
+
+    <tileCache name="groundLccGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="100" nTiles="512"
+            internalformat="R8" format="RED" type="UNSIGNED_BYTE" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <editOrthoProducer name="backgroundLccGpu1" cache="groundLccGpu"
+        residuals="groundLccCpu1" terrain="terrainNode"
+        edit="terrainShader" brush="brushOrthoShader;"/>
+    <orthoGpuProducer name="groundLccGpu1" cache="groundLccGpu" maxLevel="7">
+        <textureLayer name="background" producer="backgroundLccGpu1" tileSamplerName="sourceSampler" renderProg="copyShader;" storeTiles="true"
+            equation="ADD" equationAlpha="ADD" destinationFunction="ZERO" sourceFunction="ONE" destinationFunctionAlpha="ZERO" sourceFunctionAlpha="ONE"/>
+        <textureLayer name="slopeFilter1" producer="groundNormals1"
+            renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>
+        <textureLayer name="elevationFilter1" producer="groundElevations1"
+            renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>
+    </orthoGpuProducer>
+
+    <sequence name="cameraMethod">
+        <foreach var="o" flag="dynamic" parallel="true">
+            <callMethod name="$o.update"/>
+        </foreach>
+        <foreach var="l" flag="shadow">
+            <callMethod name="$l.shadow"/>
+        </foreach>
+        <foreach var="o" flag="object" culling="true">
+            <callMethod name="$o.draw"/>
+        </foreach>
+        <foreach var="o" flag="overlay">
+            <callMethod name="$o.draw"/>
+        </foreach>
+    </sequence>
+
+    <terrainNode name="terrain" size="50000" zmin="0" zmax="5000" splitFactor="2" maxLevel="16"/>
+
+    <sequence name="updateTerrainMethod">
+        <updateTerrain name="this.terrain"/>
+        <updateTileSamplers name="this.terrain"/>
+    </sequence>
+
+    <sequence name="drawTerrainMethod">
+        <setProgram>
+            <module name="this.material"/>
+        </setProgram>
+        <drawTerrain name="this.terrain" mesh="this.grid" culling="true"/>
+    </sequence>
+
+    <texture2D name="font" source="text.png" internalformat="R8" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"/>
+
+    <font name="basicFont" tex="font" nRows="8" nCols="12" minChar="32" maxChar="127" invalidChar="63" charWidths="19"/>
+
+    <module name="textShader" version="330" source="textShader.glsl"/>
+
+    <showInfo name="infoMethod" x="4" y="4" maxLines="4" fontSize="24" font="basicFont" fontProgram="textShader;"/>
+
+    <showLog name="logMethod" x="4" y="-4" maxLines="32" fontSize="16" font="basicFont" fontProgram="textShader;"/>
+
+    <drawTweakBar name="drawTweakBarMethod"/>
+
+    <module name="upsampleShader" version="330" source="upsampleShader.glsl"/>
+
+    <module name="upsampleLccShader" version="330" source="upsampleLccShader.glsl"/>
+
+    <module name="elevationFilter" version="330" source="elevationFilter.glsl"/>
+
+    <module name="slopeFilter" version="330" source="slopeFilter.glsl"/>
+
+    <module name="normalShader" version="330" source="normalShader.glsl"/>
+
+    <module name="selectTreeShader" version="400" source="selectTreeShader.glsl"
+        feedback="interleaved" varyings="pos,params"/>
+
+    <module name="renderTreeShader" version="400" source="renderTreeShader.glsl">
+        <uniformSampler name="treeSampler" texture="basictree"/>
+    </module>
+
+    <texture2D name="basictree" source="basictree.png" internalformat="RGBA8" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"/>
+
+    <module name="terrainShader" version="330" source="terrainShader.glsl"/>
+
+    <module name="initOrthoShader" version="330" source="initOrthoShader.glsl"/>
+
+    <module name="brushOrthoShader" version="330" source="brushOrthoShader.glsl"/>
+
+    <module name="composeOrthoShader" version="330" source="composeOrthoShader.glsl"/>
+
+    <module name="upsampleOrthoShader" version="330" source="upsampleOrthoShader.glsl"/>
+
+    <module name="copyShader" version="330" source="copyShader.glsl"/>
+
+    <node name="terrainNode" flags="object,dynamic">
+        <bounds xmin="-50000" xmax="50000" ymin="-50000" ymax="50000" zmin="0" zmax="5000"/>
+        <field id="terrain" value="terrain"/>
+        <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations1" storeInvisible="false"/>
+        <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals1" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLccGpu1" storeParent="true" storeInvisible="false"/>
+        <mesh id="grid" value="quad.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="terrainShader"/>
+    </node>
+
+    <plants name="trees"
+        selectProg="selectTreeShader;"
+        renderProg="renderTreeShader;"
+        minLevel="5" maxLevel="7" maxDistance="5000.0" tileCacheSize="400"
+        minDensity="8500" maxDensity="8500" patternCount="10">
+    </plants>
+
+    <node name="scene">
+        <node flags="camera">
+            <method id="draw" value="cameraMethod"/>
+        </node>
+
+        <node name="terrain" value="terrainNode"/>
+
+        <node name="plants" flags="object,shadow">
+            <bounds xmin="-50000" xmax="50000" ymin="-50000" ymax="50000" zmin="0" zmax="5000"/>
+            <field id="terrain" value="terrainNode"/>
+            <method id="draw" value="drawPlantsMethod"/>
+            <method id="shadow" value="drawPlantsShadowMethod"/>
+        </node>
+
+        <node flags="overlay">
+            <method id="draw" value="drawTweakBarMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="logMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="infoMethod"/>
+        </node>
+    </node>
+
+    <tweakScene name="editScene" scene="scene" active="false"/>
+
+    <tweakOrtho name="editOrtho" active="true"/>
+
+    <tweakBarManager name="ui">
+        <editor id="scene" bar="editScene" exclusive="false"/>
+        <editor id="ortho" bar="editOrtho" key="c" exclusive="true"/>
+    </tweakBarManager>
+
+</archive>

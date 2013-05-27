@@ -1,0 +1,5 @@
+const char* drawPlantsMethodSource = "\
+<?xml version=\"1.0\" ?>\n\
+<drawPlants name=\"terrain\" plants=\"trees\"/>\n\
+";
+

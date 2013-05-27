@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="proland-terrain-examples-preprocess" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="..\..\..\output\examples\terrain\preprocess\preprocessd" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="examples\preprocess" />
+				<Option object_output="..\..\..\build\Debug\examples\preprocess" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+				<Linker>
+					<Add library="ork3d" />
+					<Add library="proland-core-4_0d" />
+					<Add library="proland-terrain-4_0d" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="..\..\..\output\examples\terrain\preprocess\preprocess" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="terrain\helloworld" />
+				<Option object_output="..\..\..\build\Release\examples\preprocess" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+				<Linker>
+					<Add library="ork3" />
+					<Add library="proland-core-4_0" />
+					<Add library="proland-terrain-4_0" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-march=i686" />
+			<Add option="-pedantic-errors" />
+			<Add option="-pedantic" />
+			<Add option="-Wall" />
+			<Add option="-ansi" />
+			<Add option="-Wno-long-long" />
+			<Add option="-fno-strict-aliasing" />
+			<Add option="-DPROLAND_API=" />
+			<Add option="-DORK_API=" />
+			<Add option="-DTIXML_USE_STL" />
+			<Add option="-DSTBI_NO_STDIO" />
+			<Add option="-DSTBI_NO_WRITE" />
+			<Add directory="$(#ork3.include)" />
+			<Add directory="$(#ork3.extern)" />
+			<Add directory="$(#twbar.include)" />
+			<Add directory="..\..\sources" />
+			<Add directory="..\..\..\core\sources" />
+		</Compiler>
+		<Linker>
+			<Add directory="$(#ork3.lib)" />
+			<Add directory="..\..\..\output\bin" />
+		</Linker>
+		<Unit filename="HelloWorld.cpp" />
+		<Unit filename="bluemarble.png" />
+		<Unit filename="helloworld.xml" />
+		<Unit filename="normalShader.glsl" />
+		<Unit filename="quad.mesh" />
+		<Unit filename="srtm.png" />
+		<Unit filename="terrainShader.glsl" />
+		<Unit filename="text.png" />
+		<Unit filename="textShader.glsl" />
+		<Unit filename="upsampleOrthoShader.glsl" />
+		<Unit filename="upsampleShader.glsl" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

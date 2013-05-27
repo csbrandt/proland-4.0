@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<sequence>
+    <setProgram>
+    	<shader name="this.material"/>
+    </setProgram>
+    <drawTerrain name="this.terrain" mesh="this.grid" culling="true"/>
+</sequence>

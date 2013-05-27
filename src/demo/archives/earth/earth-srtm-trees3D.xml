@@ -1,0 +1,359 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<archive>
+    <multithreadScheduler name="defaultScheduler" nthreads="3" fps="0"/>
+
+    <!-- --------------- REDEFINITIONS --------------- -->
+
+    <module name="treeBrdf" version="330" source="treeBrdf3D.glsl">
+        <uniformSampler name="treeKcSampler" texture="treeKc"/>
+        <uniformSampler name="treeAOSampler" texture="treeAO"/>
+        <uniformSampler name="groundCoverSampler" texture="groundCover"/>
+        <uniformSampler name="treeShadowMap" texture="treeShadowMap"/>
+    </module>
+
+    <!-- --------------- GROUND DEM --------------- -->
+
+    <tileCache name="groundResiduals" scheduler="defaultScheduler">
+        <cpuFloatTileStorage tileSize="197" channels="1" capacity="1024"/>
+    </tileCache>
+    <residualProducer name="groundResiduals1" cache="groundResiduals" file="earth/dem/srtm/DEM1.dat" delta="2"/>
+    <residualProducer name="groundResiduals2" cache="groundResiduals" file="earth/dem/srtm/DEM2.dat" delta="2"/>
+    <residualProducer name="groundResiduals3" cache="groundResiduals" file="earth/dem/srtm/DEM3.dat" delta="2"/>
+    <residualProducer name="groundResiduals4" cache="groundResiduals" file="earth/dem/srtm/DEM4.dat" delta="2"/>
+    <residualProducer name="groundResiduals5" cache="groundResiduals" file="earth/dem/srtm/DEM5.dat" delta="2"/>
+    <residualProducer name="groundResiduals6" cache="groundResiduals" file="earth/dem/srtm/DEM6.dat" delta="2"/>
+
+    <tileCache name="groundElevations" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="101" nTiles="1296"
+            internalformat="RGB32F" format="RGB" type="FLOAT" min="NEAREST" mag="NEAREST"/>
+    </tileCache>
+    <elevationProducer name="groundElevations1" cache="groundElevations" residuals="groundResiduals1"
+        noise="0,0,0,0,0,0,0,0,0,0,0,5,2.5,1,0.5,0.25,0.1,0.05,0.025,0.01,0.01,0.005,0.005"/>
+    <elevationProducer name="groundElevations2" cache="groundElevations" residuals="groundResiduals2"
+        noise="0,0,0,0,0,0,0,0,0,0,0,5,2.5,1,0.5,0.25,0.1,0.05,0.025,0.01,0.01,0.005,0.005"/>
+    <elevationProducer name="groundElevations3" cache="groundElevations" residuals="groundResiduals3"
+        noise="0,0,0,0,0,0,0,0,0,0,0,5,2.5,1,0.5,0.25,0.1,0.05,0.025,0.01,0.01,0.005,0.005"/>
+    <elevationProducer name="groundElevations4" cache="groundElevations" residuals="groundResiduals4"
+        noise="0,0,0,0,0,0,0,0,0,0,0,5,2.5,1,0.5,0.25,0.1,0.05,0.025,0.01,0.01,0.005,0.005"/>
+    <elevationProducer name="groundElevations5" cache="groundElevations" residuals="groundResiduals5"
+        noise="0,0,0,0,0,0,0,0,0,0,0,5,2.5,1,0.5,0.25,0.1,0.05,0.025,0.01,0.01,0.005,0.005"/>
+    <elevationProducer name="groundElevations6" cache="groundElevations" residuals="groundResiduals6"
+        noise="0,0,0,0,0,0,0,0,0,0,0,5,2.5,1,0.5,0.25,0.1,0.05,0.025,0.01,0.01,0.005,0.005"/>
+
+    <tileCache name="groundNormals" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="97" nTiles="1296"
+            internalformat="RG8" format="RG" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <normalProducer name="groundNormals1" cache="groundNormals" elevations="groundElevations1" deform="sphere"/>
+    <normalProducer name="groundNormals2" cache="groundNormals" elevations="groundElevations2" deform="sphere"/>
+    <normalProducer name="groundNormals3" cache="groundNormals" elevations="groundElevations3" deform="sphere"/>
+    <normalProducer name="groundNormals4" cache="groundNormals" elevations="groundElevations4" deform="sphere"/>
+    <normalProducer name="groundNormals5" cache="groundNormals" elevations="groundElevations5" deform="sphere"/>
+    <normalProducer name="groundNormals6" cache="groundNormals" elevations="groundElevations6" deform="sphere"/>
+
+    <!-- --------------- GROUND RGB --------------- -->
+
+    <tileCache name="groundOrthoCpu" scheduler="defaultScheduler">
+        <cpuByteTileStorage tileSize="196" channels="4" capacity="1024"/>
+    </tileCache>
+    <orthoCpuProducer name="groundOrthoCpu1" cache="groundOrthoCpu" file="earth/rgb/july/residuals/RGB1.dat"/>
+    <orthoCpuProducer name="groundOrthoCpu2" cache="groundOrthoCpu" file="earth/rgb/july/residuals/RGB2.dat"/>
+    <orthoCpuProducer name="groundOrthoCpu3" cache="groundOrthoCpu" file="earth/rgb/july/residuals/RGB3.dat"/>
+    <orthoCpuProducer name="groundOrthoCpu4" cache="groundOrthoCpu" file="earth/rgb/july/residuals/RGB4.dat"/>
+    <orthoCpuProducer name="groundOrthoCpu5" cache="groundOrthoCpu" file="earth/rgb/july/residuals/RGB5.dat"/>
+    <orthoCpuProducer name="groundOrthoCpu6" cache="groundOrthoCpu" file="earth/rgb/july/residuals/RGB6.dat"/>
+
+    <tileCache name="groundOrthoGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="196" nTiles="486"
+            internalformat="RGBA8" format="RGBA" type="UNSIGNED_BYTE" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"
+            anisotropy="16"/>
+    </tileCache>
+    <orthoProducer name="groundOrthoGpu1" cache="groundOrthoGpu" residuals="groundOrthoCpu1"
+        hsv="true" cnoise="25,12.5,127.5" noise="0,0,0,0,0,0,0,0,100,120,140,160,180,200,220,240,255,255,255,255,255,255,255,255"/>
+    <orthoProducer name="groundOrthoGpu2" cache="groundOrthoGpu" residuals="groundOrthoCpu2"
+        hsv="true" cnoise="25,12.5,127.5" noise="0,0,0,0,0,0,0,0,100,120,140,160,180,200,220,240,255,255,255,255,255,255,255,255"/>
+    <orthoProducer name="groundOrthoGpu3" cache="groundOrthoGpu" residuals="groundOrthoCpu3"
+        hsv="true" cnoise="25,12.5,127.5" noise="0,0,0,0,0,0,0,0,100,120,140,160,180,200,220,240,255,255,255,255,255,255,255,255"/>
+    <orthoProducer name="groundOrthoGpu4" cache="groundOrthoGpu" residuals="groundOrthoCpu4"
+        hsv="true" cnoise="25,12.5,127.5" noise="0,0,0,0,0,0,0,0,100,120,140,160,180,200,220,240,255,255,255,255,255,255,255,255"/>
+    <orthoProducer name="groundOrthoGpu5" cache="groundOrthoGpu" residuals="groundOrthoCpu5"
+        hsv="true" cnoise="25,12.5,127.5" noise="0,0,0,0,0,0,0,0,100,120,140,160,180,200,220,240,255,255,255,255,255,255,255,255"/>
+    <orthoProducer name="groundOrthoGpu6" cache="groundOrthoGpu" residuals="groundOrthoCpu6"
+        hsv="true" cnoise="25,12.5,127.5" noise="0,0,0,0,0,0,0,0,100,120,140,160,180,200,220,240,255,255,255,255,255,255,255,255"/>
+
+    <tileCache name="groundAmbientApertureCpu" scheduler="defaultScheduler">
+        <cpuByteTileStorage tileSize="196" channels="3" capacity="1024"/>
+    </tileCache>
+    <orthoCpuProducer name="groundAmbientApertureCpu1" cache="groundAmbientApertureCpu" file="earth/dem/srtm/aperture/APERTURE1.dat"/>
+    <orthoCpuProducer name="groundAmbientApertureCpu2" cache="groundAmbientApertureCpu" file="earth/dem/srtm/aperture/APERTURE2.dat"/>
+    <orthoCpuProducer name="groundAmbientApertureCpu3" cache="groundAmbientApertureCpu" file="earth/dem/srtm/aperture/APERTURE3.dat"/>
+    <orthoCpuProducer name="groundAmbientApertureCpu4" cache="groundAmbientApertureCpu" file="earth/dem/srtm/aperture/APERTURE4.dat"/>
+    <orthoCpuProducer name="groundAmbientApertureCpu5" cache="groundAmbientApertureCpu" file="earth/dem/srtm/aperture/APERTURE5.dat"/>
+    <orthoCpuProducer name="groundAmbientApertureCpu6" cache="groundAmbientApertureCpu" file="earth/dem/srtm/aperture/APERTURE6.dat"/>
+
+    <tileCache name="groundAmbientApertureGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="196" nTiles="486"
+            internalformat="RGB8" format="RGB" type="UNSIGNED_BYTE" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <orthoGpuProducer name="groundAmbientApertureGpu1" cache="groundAmbientApertureGpu" ortho="groundAmbientApertureCpu1"/>
+    <orthoGpuProducer name="groundAmbientApertureGpu2" cache="groundAmbientApertureGpu" ortho="groundAmbientApertureCpu2"/>
+    <orthoGpuProducer name="groundAmbientApertureGpu3" cache="groundAmbientApertureGpu" ortho="groundAmbientApertureCpu3"/>
+    <orthoGpuProducer name="groundAmbientApertureGpu4" cache="groundAmbientApertureGpu" ortho="groundAmbientApertureCpu4"/>
+    <orthoGpuProducer name="groundAmbientApertureGpu5" cache="groundAmbientApertureGpu" ortho="groundAmbientApertureCpu5"/>
+    <orthoGpuProducer name="groundAmbientApertureGpu6" cache="groundAmbientApertureGpu" ortho="groundAmbientApertureCpu6"/>
+
+    <!-- --------------- GROUND LCC --------------- -->
+
+    <tileCache name="groundLccCpu" scheduler="defaultScheduler">
+        <cpuByteTileStorage tileSize="196" channels="2" capacity="1024"/>
+    </tileCache>
+    <orthoCpuProducer name="groundLccCpu1" cache="groundLccCpu" file="earth/cover/cover/residuals/COVER1.dat"/>
+    <orthoCpuProducer name="groundLccCpu2" cache="groundLccCpu" file="earth/cover/cover/residuals/COVER2.dat"/>
+    <orthoCpuProducer name="groundLccCpu3" cache="groundLccCpu" file="earth/cover/cover/residuals/COVER3.dat"/>
+    <orthoCpuProducer name="groundLccCpu4" cache="groundLccCpu" file="earth/cover/cover/residuals/COVER4.dat"/>
+    <orthoCpuProducer name="groundLccCpu5" cache="groundLccCpu" file="earth/cover/cover/residuals/COVER5.dat"/>
+    <orthoCpuProducer name="groundLccCpu6" cache="groundLccCpu" file="earth/cover/cover/residuals/COVER6.dat"/>
+
+    <tileCache name="groundLccGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="196" nTiles="300"
+            internalformat="RGB8" format="RGB" type="UNSIGNED_BYTE" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"
+            anisotropy="16"/>
+    </tileCache>
+    <orthoProducer name="groundLccGpu1" cache="groundLccGpu" residuals="groundLccCpu1" maxLevel="11" cnoise="25,25,0,0" noise="0,0,0,0,0,0,0,255,255,255,255" upsampleProg="globalsShaderFS;upsampleLccShader;">
+<!--         <textureLayer name="slopeFilter1" level="6" producer="groundNormals1" renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>-->
+<!--         <textureLayer name="elevationFilter1" level="6" producer="groundElevations1" renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>-->
+    </orthoProducer>
+    <orthoProducer name="groundLccGpu2" cache="groundLccGpu" residuals="groundLccCpu2" maxLevel="11" cnoise="25,25,0,0" noise="0,0,0,0,0,0,0,255,255,255,255" upsampleProg="globalsShaderFS;upsampleLccShader;">
+<!--         <textureLayer name="slopeFilter2" level="6" producer="groundNormals2" renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>-->
+<!--         <textureLayer name="elevationFilter2" level="6" producer="groundElevations2" renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>-->
+    </orthoProducer>
+    <orthoProducer name="groundLccGpu3" cache="groundLccGpu" residuals="groundLccCpu3" maxLevel="11" cnoise="25,25,0,0" noise="0,0,0,0,0,0,0,255,255,255,255" upsampleProg="globalsShaderFS;upsampleLccShader;">
+<!--         <textureLayer name="slopeFilter3" level="6" producer="groundNormals3" renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>-->
+<!--         <textureLayer name="elevationFilter3" level="6" producer="groundElevations3" renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>-->
+    </orthoProducer>
+    <orthoProducer name="groundLccGpu4" cache="groundLccGpu" residuals="groundLccCpu4" maxLevel="11" cnoise="25,25,0,0" noise="0,0,0,0,0,0,0,255,255,255,255" upsampleProg="globalsShaderFS;upsampleLccShader;">
+<!--         <textureLayer name="slopeFilter4" level="6" producer="groundNormals4" renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>-->
+<!--         <textureLayer name="elevationFilter4" level="6" producer="groundElevations4" renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>-->
+    </orthoProducer>
+    <orthoProducer name="groundLccGpu5" cache="groundLccGpu" residuals="groundLccCpu5" maxLevel="11" cnoise="25,25,0,0" noise="0,0,0,0,0,0,0,255,255,255,255" upsampleProg="globalsShaderFS;upsampleLccShader;">
+<!--         <textureLayer name="slopeFilter5" level="6" producer="groundNormals5" renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>-->
+<!--         <textureLayer name="elevationFilter5" level="6" producer="groundElevations5" renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>-->
+    </orthoProducer>
+    <orthoProducer name="groundLccGpu6" cache="groundLccGpu" residuals="groundLccCpu6" maxLevel="11" cnoise="25,25,0,0" noise="0,0,0,0,0,0,0,255,255,255,255" upsampleProg="globalsShaderFS;upsampleLccShader;">
+<!--         <textureLayer name="slopeFilter6" level="6" producer="groundNormals6" renderProg="slopeFilter;" tileSamplerName="fragmentNormalSampler"/>-->
+<!--         <textureLayer name="elevationFilter6" level="6" producer="groundElevations6" renderProg="elevationFilter;" tileSamplerName="elevationSampler"/>-->
+    </orthoProducer>
+
+    <lccProducer name="groundLcc1" density="groundLccGpu1" plants="trees" maxLevel="13" deform="true"/>
+    <lccProducer name="groundLcc2" density="groundLccGpu2" plants="trees" maxLevel="13" deform="true"/>
+    <lccProducer name="groundLcc3" density="groundLccGpu3" plants="trees" maxLevel="13" deform="true"/>
+    <lccProducer name="groundLcc4" density="groundLccGpu4" plants="trees" maxLevel="13" deform="true"/>
+    <lccProducer name="groundLcc5" density="groundLccGpu5" plants="trees" maxLevel="13" deform="true"/>
+    <lccProducer name="groundLcc6" density="groundLccGpu6" plants="trees" maxLevel="13" deform="true"/>
+
+    <!-- --------------- GROUND NODES --------------- -->
+
+    <terrainNode name="earth1" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="23"/>
+    <terrainNode name="earth2" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="23"/>
+    <terrainNode name="earth3" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="23"/>
+    <terrainNode name="earth4" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="23"/>
+    <terrainNode name="earth5" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="23"/>
+    <terrainNode name="earth6" size="6360000" zmin="0" zmax="10000" deform="sphere" splitFactor="2" maxLevel="23"/>
+
+    <!-- --------------- SCENE --------------- -->
+
+    <node name="earth1Node" flags="object,dynamic">
+        <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+        <field id="terrain" value="earth1"/>
+        <tileSamplerZ id="elevation" name="elevationSampler" sampler="elevationSampler" producer="groundElevations1" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="fnormal" name="fragmentNormalSampler" sampler="fragmentNormalSampler" producer="groundNormals1" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" name="orthoSampler" sampler="orthoSampler" producer="groundOrthoGpu1" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="aperture" name="ambientApertureSampler" sampler="ambientApertureSampler" producer="groundAmbientApertureGpu1" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLcc1" storeParent="false" storeInvisible="false"/>
+        <mesh id="grid" value="grid25.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="earthShader"/>
+    </node>
+
+    <node name="earth2Node" flags="object,dynamic">
+        <rotatex angle="90"/>
+        <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+        <field id="terrain" value="earth2"/>
+        <tileSamplerZ id="elevation" name="elevationSampler" sampler="elevationSampler" producer="groundElevations2" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="fnormal" name="fragmentNormalSampler" sampler="fragmentNormalSampler" producer="groundNormals2" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" name="orthoSampler" sampler="orthoSampler" producer="groundOrthoGpu2" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="aperture" name="ambientApertureSampler" sampler="ambientApertureSampler" producer="groundAmbientApertureGpu2" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLcc2" storeParent="false" storeInvisible="false"/>
+        <mesh id="grid" value="grid25.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="earthShader"/>
+    </node>
+
+    <node name="earth3Node" flags="object,dynamic">
+        <rotatex angle="90"/>
+        <rotatey angle="90"/>
+        <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+        <field id="terrain" value="earth3"/>
+        <tileSamplerZ id="elevation" name="elevationSampler" sampler="elevationSampler" producer="groundElevations3" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="fnormal" name="fragmentNormalSampler" sampler="fragmentNormalSampler" producer="groundNormals3" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" name="orthoSampler" sampler="orthoSampler" producer="groundOrthoGpu3" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="aperture" name="ambientApertureSampler" sampler="ambientApertureSampler" producer="groundAmbientApertureGpu3" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLcc3" storeParent="false" storeInvisible="false"/>
+        <mesh id="grid" value="grid25.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="earthShader"/>
+    </node>
+
+    <node name="earth4Node" flags="object,dynamic">
+        <rotatex angle="90"/>
+        <rotatey angle="180"/>
+        <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+        <field id="terrain" value="earth4"/>
+        <tileSamplerZ id="elevation" name="elevationSampler" sampler="elevationSampler" producer="groundElevations4" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="fnormal" name="fragmentNormalSampler" sampler="fragmentNormalSampler" producer="groundNormals4" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" name="orthoSampler" sampler="orthoSampler" producer="groundOrthoGpu4" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="aperture" name="ambientApertureSampler" sampler="ambientApertureSampler" producer="groundAmbientApertureGpu4" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLcc4" storeParent="false" storeInvisible="false"/>
+        <mesh id="grid" value="grid25.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="earthShader"/>
+    </node>
+
+    <node name="earth5Node" flags="object,dynamic">
+        <rotatex angle="90"/>
+        <rotatey angle="270"/>
+        <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+        <field id="terrain" value="earth5"/>
+        <tileSamplerZ id="elevation" name="elevationSampler" sampler="elevationSampler" producer="groundElevations5" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="fnormal" name="fragmentNormalSampler" sampler="fragmentNormalSampler" producer="groundNormals5" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" name="orthoSampler" sampler="orthoSampler" producer="groundOrthoGpu5" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="aperture" name="ambientApertureSampler" sampler="ambientApertureSampler" producer="groundAmbientApertureGpu5" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLcc5" storeParent="false" storeInvisible="false"/>
+        <mesh id="grid" value="grid25.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="earthShader"/>
+    </node>
+
+    <node name="earth6Node" flags="object,dynamic">
+        <rotatex angle="180"/>
+        <bounds xmin="-4504270" xmax="4504270" ymin="-4504270" ymax="4504270" zmin="4494270" zmax="6370000"/>
+        <field id="terrain" value="earth6"/>
+        <tileSamplerZ id="elevation" name="elevationSampler" sampler="elevationSampler" producer="groundElevations6" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="fnormal" name="fragmentNormalSampler" sampler="fragmentNormalSampler" producer="groundNormals6" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="ortho" name="orthoSampler" sampler="orthoSampler" producer="groundOrthoGpu6" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="aperture" name="ambientApertureSampler" sampler="ambientApertureSampler" producer="groundAmbientApertureGpu6" storeParent="false" storeInvisible="false"/>
+        <tileSampler id="lcc" sampler="lccSampler" producer="groundLcc6" storeParent="false" storeInvisible="false"/>
+        <mesh id="grid" value="grid25.mesh"/>
+        <method id="update" value="updateTerrainMethod"/>
+        <method id="draw" value="drawTerrainMethod"/>
+        <module id="material" value="earthShader"/>
+    </node>
+
+    <plants name="trees"
+      selectProg="globalsShaderGS;selectTreeShader;"
+      shadowProg="globalsShaderGS;globalsShaderFS;renderTreeShadow3D;"
+      renderProg="globalsShaderGS;globalsShaderFS;atmosphereShaderGS;renderTreeShader3D-shadows;"
+      minLevel="12" maxLevel="14" maxDistance="5000.0" tileCacheSize="400"
+      lodDistance="1400.0" minDensity="8500" maxDensity="8500" patternCount="10">
+    </plants>
+
+    <node name="scene">
+        <node flags="camera">
+            <method id="draw" value="cameraMethod"/>
+            <module id="globals" value="globalsShaderFS"/>
+        </node>
+
+        <node name="sun" flags="light">
+            <translate x="0" y="-1" z="0"/>
+            <method id="draw" value="sunMethod"/>
+        </node>
+
+<!--        <node name="oceanFFT" flags="object">-->
+<!--            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>-->
+<!--            <method id="draw" value="drawOceanFFTMethod"/>-->
+<!--            <module id="material" value="oceanFFTShader"/>-->
+<!--        </node>-->
+
+        <node name="earth1" value="earth1Node"/>
+        <node name="earth2" value="earth2Node"/>
+        <node name="earth3" value="earth3Node"/>
+        <node name="earth4" value="earth4Node"/>
+        <node name="earth5" value="earth5Node"/>
+        <node name="earth6" value="earth6Node"/>
+
+        <node name="plants" flags="object,shadow">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <field id="terrain1" value="earth1Node"/>
+            <field id="terrain2" value="earth2Node"/>
+            <field id="terrain3" value="earth3Node"/>
+            <field id="terrain4" value="earth4Node"/>
+            <field id="terrain5" value="earth5Node"/>
+            <field id="terrain6" value="earth6Node"/>
+            <method id="draw" value="drawPlantsMethod"/>
+            <method id="shadow" value="drawPlantsShadowMethod"/>
+        </node>
+
+        <node name="sky" flags="object">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <mesh id="geometry" value="quad.mesh"/>
+            <method id="draw" value="raycastMethod"/>
+            <module id="material" value="sky1Shader"/>
+        </node>
+
+        <node flags="overlay">
+            <method id="draw" value="drawTweakBarMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="logMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="infoMethod"/>
+        </node>
+    </node>
+
+    <!-- --------------- USER INTERFACE --------------- -->
+
+    <basicViewHandler name="viewHandler" viewManager="window"/>
+
+    <tweakScene name="editScene" scene="scene" active="false"/>
+
+    <tweakBarManager name="tweakBar" next="viewHandler">
+        <editor id="resources" bar="prolandTweakBar" permanent="true" exclusive="false"/>
+        <editor id="view" bar="tweakEarthViews" permanent="true" exclusive="false"/>
+        <editor id="scene" bar="editScene" exclusive="false"/>
+    </tweakBarManager>
+
+    <eventRecorder name="eventRecorder" recorded="window" videoDirectory="video/frame-%.5d.tga" cursorTexture="cursor" next="tweakBar"/>
+
+    <prolandDemo name="window" ui="eventRecorder" view="viewHandler" radius="6360000.0"/>
+
+</archive>
