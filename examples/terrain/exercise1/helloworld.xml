@@ -1,0 +1,214 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<archive>
+    <multithreadScheduler name="defaultScheduler" nthreads="3" fps="0"/>
+
+    <tileCache name="groundElevations" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="101" nTiles="512"
+            internalformat="RGB32F" format="RGB" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <elevationProducer name="groundElevations1" cache="groundElevations"
+        noise="-140,-100,-15,-8,5,2.5,1.5,1,0.5,0.25,0.1,0.05"/>
+
+    <tileCache name="groundNormals" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="97" nTiles="512"
+            internalformat="RG8" format="RG" type="FLOAT" min="LINEAR" mag="LINEAR"/>
+    </tileCache>
+    <normalProducer name="groundNormals1" cache="groundNormals" elevations="groundElevations1"/>
+
+    <tileCache name="groundOrthoGpu" scheduler="defaultScheduler">
+        <gpuTileStorage tileSize="196" nTiles="512"
+            internalformat="RGB8" format="RGB" type="UNSIGNED_BYTE" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"
+            anisotropy="16"/>
+    </tileCache>
+    <orthoProducer name="groundOrthoGpu1" cache="groundOrthoGpu"
+        hsv="true" rnoise="60,150,20" cnoise="70,80,100"
+        noise="255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255"/>
+
+    <sequence name="cameraMethod">
+        <setTransforms module="globalsShader" worldPos="worldCameraPos"/>
+        <foreach var="o" flag="dynamic" parallel="true">
+            <callMethod name="$o.update"/>
+        </foreach>
+        <foreach var="l" flag="light">
+            <callMethod name="$l.draw"/>
+        </foreach>
+        <foreach var="o" flag="object" culling="true">
+            <callMethod name="$o.draw"/>
+        </foreach>
+        <foreach var="o" flag="overlay">
+            <callMethod name="$o.draw"/>
+        </foreach>
+    </sequence>
+
+    <terrainNode name="terrain" size="50000" zmin="0" zmax="5000" splitFactor="2" maxLevel="16"/>
+
+    <sequence name="updateTerrainMethod">
+        <updateTerrain name="this.terrain"/>
+        <updateTileSamplers name="this.terrain"/>
+    </sequence>
+
+    <sequence name="drawTerrainMethod">
+        <setProgram>
+            <module name="globalsShader"/>
+            <module name="atmosphereShader"/>
+            <module name="this.material"/>
+        </setProgram>
+        <drawTerrain name="this.terrain" mesh="this.grid" culling="true"/>
+    </sequence>
+
+    <sequence name="drawOceanMethod">
+        <setProgram>
+            <module name="globalsShader"/>
+            <module name="atmosphereShader"/>
+            <module name="this.material"/>
+        </setProgram>
+        <drawOcean radius="0.0" zmin="20000.0" brdfShader="oceanShader"/>
+    </sequence>
+
+    <module name="oceanShader" version="330" source="oceanShader.glsl"/>
+
+    <sequence name="sunMethod">
+        <setTransforms module="globalsShader" worldPos="worldSunDir"/>
+    </sequence>
+
+    <sequence name="raycastMethod">
+        <setProgram>
+            <module name="globalsShader"/>
+            <module name="atmosphereShader"/>
+            <module name="this.material"/>
+        </setProgram>
+        <setTransforms cameraToWorld="cameraToWorld" screenToCamera="screenToCamera"/>
+        <drawMesh name="this.geometry"/>
+    </sequence>
+
+    <module name="globalsShader" version="330" vertex="globalsShader.glsl" fragment="globalsShader.glsl">
+        <uniform1f name="hdrExposure" x="0.4"/>
+    </module>
+
+    <module name="atmosphereShader" version="330" fragment="atmosphereShader.glsl">
+        <uniformSampler name="transmittanceSampler" texture="transmittance"/>
+        <uniformSampler name="skyIrradianceSampler" texture="irradiance"/>
+        <uniformSampler name="inscatterSampler" texture="inscatter"/>
+    </module>
+
+    <module name="skyShader" version="330" source="skyShader.glsl">
+        <uniformSampler name="glareSampler" texture="sunglare"/>
+        <uniform3f name="origin" x="0.0" y="0.0" z="6360000.0"/>
+    </module>
+
+    <texture2D name="transmittance" source="transmittance.raw" internalformat="RGBA16F" min="LINEAR" mag="LINEAR" wraps="CLAMP_TO_EDGE" wrapt="CLAMP_TO_EDGE"/>
+
+    <texture2D name="irradiance" source="irradiance.raw" internalformat="RGBA16F" min="LINEAR" mag="LINEAR" wraps="CLAMP_TO_EDGE" wrapt="CLAMP_TO_EDGE"/>
+
+    <texture3D name="inscatter" source="inscatter.raw" internalformat="RGBA16F" min="LINEAR" mag="LINEAR" wraps="CLAMP_TO_EDGE" wrapt="CLAMP_TO_EDGE" wrapr="CLAMP_TO_EDGE"/>
+
+    <texture2D name="sunglare" source="sunglare.png" internalformat="RGB8" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"/>
+
+    <texture2D name="font" source="text.png" internalformat="R8" min="LINEAR_MIPMAP_LINEAR" mag="LINEAR"/>
+
+    <font name="basicFont" tex="font" nRows="8" nCols="12" minChar="32" maxChar="127" invalidChar="63" charWidths="19"/>
+
+    <module name="textShader" version="330" source="textShader.glsl"/>
+
+    <showInfo name="infoMethod" x="4" y="4" maxLines="4" fontSize="24" font="basicFont" fontProgram="textShader;"/>
+
+    <showLog name="logMethod" x="4" y="-4" maxLines="32" fontSize="16" font="basicFont" fontProgram="textShader;"/>
+
+    <drawTweakBar name="drawTweakBarMethod"/>
+
+    <module name="upsampleShader" version="330" source="upsampleShader.glsl"/>
+
+    <module name="upsampleOrthoShader" version="330" source="upsampleOrthoShader.glsl"/>
+
+    <module name="normalShader" version="330" source="normalShader.glsl"/>
+
+    <module name="terrainShader" version="330" source="terrainShader.glsl"/>
+
+    <node name="scene">
+        <node flags="camera">
+            <method id="draw" value="cameraMethod"/>
+        </node>
+
+        <node name="sun" flags="light">
+            <translate x="0" y="0" z="1"/>
+            <method id="draw" value="sunMethod"/>
+        </node>
+
+        <node name="ocean" flags="object">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <method id="draw" value="drawOceanMethod"/>
+            <module id="material" value="oceanShader"/>
+        </node>
+
+        <node name="terrainNode" flags="object,dynamic">
+            <bounds xmin="-50000" xmax="50000" ymin="-50000" ymax="50000" zmin="0" zmax="5000"/>
+            <field id="terrain" value="terrain"/>
+            <tileSamplerZ id="elevation" sampler="elevationSampler" producer="groundElevations1" storeInvisible="false"/>
+            <tileSampler id="fnormal" sampler="fragmentNormalSampler" producer="groundNormals1" storeParent="false" storeInvisible="false"/>
+            <tileSampler id="ortho" sampler="orthoSampler" producer="groundOrthoGpu1" storeParent="true" storeInvisible="false"/>
+            <mesh id="grid" value="quad.mesh"/>
+            <method id="update" value="updateTerrainMethod"/>
+            <method id="draw" value="drawTerrainMethod"/>
+            <module id="material" value="terrainShader"/>
+        </node>
+
+        <node name="sky" flags="object">
+            <bounds xmin="-6370000" xmax="6370000" ymin="-6370000" ymax="6370000" zmin="-6370000" zmax="6370000"/>
+            <mesh id="geometry" value="square.mesh"/>
+            <method id="draw" value="raycastMethod"/>
+            <module id="material" value="skyShader"/>
+        </node>
+
+        <node flags="overlay">
+            <method id="draw" value="drawTweakBarMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="logMethod"/>
+        </node>
+        <node flags="overlay">
+            <method id="draw" value="infoMethod"/>
+        </node>
+    </node>
+
+    <basicViewHandler name="viewHandler" viewManager="window"/>
+
+    <tweakScene name="editScene" scene="scene" active="false"/>
+
+    <tweakBar name="settings" label="Options">
+        <float label="Exposure" keyincr="+" keydecr="-"
+            group="Rendering" help="Choose exposure factor for tone mapping"
+            min="0.01" max="10.0" step="0.01" path="sky/material/hdrExposure"/>
+    </tweakBar>
+
+    <tweakBarManager name="tweakBar" next="viewHandler">
+        <editor id="resources" bar="settings" permanent="true" exclusive="false"/>
+        <editor id="scene" bar="editScene" exclusive="false"/>
+    </tweakBarManager>
+
+    <helloworld name="window" ui="tweakBar" view="viewHandler"/>
+
+</archive>

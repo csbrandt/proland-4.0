@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.0"
+   viewBox="0 0 570 290"
+   style="width:100%; height:100%;" preserveAspectRatio="xMidYMid slice"
+   id="svg2">
+  <defs
+     id="defs4">
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutS"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.2,0.2)"
+         id="path5458"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInS"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(-0.2,-0.2)"
+         id="path5467"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutM"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.4,0.4)"
+         id="path5461"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInM"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(-0.4,-0.4)"
+         id="path5470"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInMf"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(-0.4,-0.4)"
+         id="path6634"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMe"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.4,0.4)"
+         id="path6637"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMU"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.4,0.4)"
+         id="path7817"
+         style="fill:#ff0000;fill-rule:evenodd;stroke:#ff0000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInMfK"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(-0.4,-0.4)"
+         id="path12474"
+         style="fill:#0000ff;fill-rule:evenodd;stroke:#0000ff;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMew"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.4,0.4)"
+         id="path12477"
+         style="fill:#0000ff;fill-rule:evenodd;stroke:#0000ff;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMUv"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.4,0.4)"
+         id="path13704"
+         style="fill:#0000ff;fill-rule:evenodd;stroke:#0000ff;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleInMfR"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(-0.4,-0.4)"
+         id="path14937"
+         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMey"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.4,0.4)"
+         id="path14940"
+         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt;marker-start:none" />
+    </marker>
+    <marker
+       refX="0"
+       refY="0"
+       orient="auto"
+       id="TriangleOutMUj"
+       style="overflow:visible">
+      <path
+         d="M 5.77,0 L -2.88,5 L -2.88,-5 L 5.77,0 z"
+         transform="scale(0.4,0.4)"
+         id="path16177"
+         style="fill:#008000;fill-rule:evenodd;stroke:#008000;stroke-width:1pt;marker-start:none" />
+    </marker>
+  </defs>
+  <g
+     transform="translate(280,-738.1402)"
+     id="layer1">
+    <rect
+       width="570"
+       height="290.00003"
+       x="-280"
+       y="738.1402"
+       id="rect3155"
+       style="opacity:1;fill:#f9f9f9;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:2.00000002, 1.00000002;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       width="259.98135"
+       height="259.92685"
+       x="14.98094"
+       y="753.17719"
+       id="rect5180"
+       style="opacity:1;fill:#c4c4ff;fill-opacity:1;stroke:#ff0000;stroke-width:1;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       width="0"
+       height="2.0203052"
+       x="330"
+       y="139.18428"
+       id="rect2168"
+       style="fill:#32d9f5;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       width="129.92937"
+       height="129.93069"
+       x="60.070633"
+       y="878.1402"
+       id="rect5190"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#0000ff;stroke-width:1;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       width="80.002991"
+       height="80.071999"
+       x="105.00119"
+       y="843.06818"
+       id="rect2465"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:1.00000024;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       x="140"
+       y="858.14026"
+       id="text3323"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="140"
+         y="858.14026"
+         id="tspan3325"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Verdana;-inkscape-font-specification:Verdana">L</tspan></text>
+    <rect
+       width="40.016941"
+       height="40.016941"
+       x="105"
+       y="923.1402"
+       id="rect5162"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#0000ff;stroke-width:1.00000024;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       x="115"
+       y="938.14026"
+       id="text5166"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="115"
+         y="938.14026"
+         id="tspan5168"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;font-family:Verdana;-inkscape-font-specification:Verdana">L/2</tspan></text>
+    <path
+       d="M 15,853.14017 L 105,853.14017"
+       id="path5194"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M 175,753.14017 L 175,843.14017"
+       id="path5783"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M 145.00001,958.14023 L 190,958.14023"
+       id="path5789"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M 140,878.14017 L 140,923.14016"
+       id="path5791"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M 175,923.14017 L 175,1013.1402"
+       id="path6971"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M 185,853.14017 L 275,853.14017"
+       id="path8147"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M 140,963.14014 L 140,1008.1402"
+       id="path9910"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M 60,958.14023 L 104.99999,958.14023"
+       id="path11086"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       x="50"
+       y="848.1402"
+       id="text13436"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="50"
+         y="848.1402"
+         id="tspan13438"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Verdana;-inkscape-font-specification:Verdana">kL</tspan></text>
+    <text
+       x="180"
+       y="798.1402"
+       id="text13440"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="180"
+         y="798.1402"
+         id="tspan13442"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Verdana;-inkscape-font-specification:Verdana">kL, <tspan
+   id="tspan13508"
+   style="fill:#000000">k&gt;1</tspan></tspan></text>
+    <text
+       x="145"
+       y="903.1402"
+       id="text13444"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="145"
+         y="903.1402"
+         id="tspan13446"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;font-family:Verdana;-inkscape-font-specification:Verdana">kL/2</tspan></text>
+    <text
+       x="70"
+       y="953.14026"
+       id="text13448"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="70"
+         y="953.14026"
+         id="tspan13450"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;font-family:Verdana;-inkscape-font-specification:Verdana">kL/2</tspan></text>
+    <rect
+       width="219.83978"
+       height="219.84006"
+       x="-259.923"
+       y="773.22314"
+       id="rect13452"
+       style="opacity:1;fill:#c4c4ff;fill-opacity:1;stroke:#ff0000;stroke-width:1.00000012;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:2.00000011, 2.00000011;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       width="109.84019"
+       height="109.84018"
+       x="-224.92331"
+       y="888.22272"
+       id="rect13454"
+       style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#0000ff;stroke-width:1;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:2.00000001, 2.00000001;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       width="110"
+       height="5"
+       x="-225"
+       y="255.00003"
+       transform="translate(0,738.14014)"
+       id="rect13500"
+       style="opacity:1;fill:#666666;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:3, 3;stroke-dashoffset:0;stroke-opacity:1" />
+    <rect
+       width="80.002991"
+       height="80.071999"
+       x="-190"
+       y="843.1402"
+       id="rect13456"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#ff0000;stroke-width:1.00000024;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       x="-155"
+       y="858.14026"
+       id="text13458"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="-155"
+         y="858.14026"
+         id="tspan13460"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Verdana;-inkscape-font-specification:Verdana">L</tspan></text>
+    <rect
+       width="40.016941"
+       height="40.016941"
+       x="-190.00117"
+       y="923.19525"
+       id="rect13462"
+       style="opacity:1;fill:none;fill-opacity:1;stroke:#0000ff;stroke-width:1.00000024;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       x="-180.00119"
+       y="938.21216"
+       id="text13464"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="-180.00119"
+         y="938.21216"
+         id="tspan13466"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;font-family:Verdana;-inkscape-font-specification:Verdana">L/2</tspan></text>
+    <path
+       d="M -259.32527,853.21212 L -189.53898,853.21212"
+       id="path13468"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:3.00000007, 3.00000007;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M -120,773.35274 L -120,843.14023"
+       id="path13470"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:0.99999994;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:2.99999996, 2.99999996;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M -150,958.14023 L -115.2024,958.14023"
+       id="path13472"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:3.00000006, 3.00000006;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M -155,888.27044 L -155,923.14023"
+       id="path13474"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:2.99999997, 2.99999997;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M -120,923.42541 L -120,993.14023"
+       id="path13476"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:3.00000005, 3.00000005;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M -110.46336,853.21212 L -40.674657,853.21212"
+       id="path13478"
+       style="fill:none;fill-rule:evenodd;stroke:#ff0000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMf);marker-mid:none;marker-end:url(#TriangleOutMe);stroke-miterlimit:4;stroke-dasharray:3.00000004, 3.00000004;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M -155,963.14023 L -155,997.86325"
+       id="path13480"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:3.00000002, 3.00000002;stroke-dashoffset:0;stroke-opacity:1" />
+    <path
+       d="M -225,958.14023 L -190.20481,958.14023"
+       id="path13482"
+       style="fill:none;fill-rule:evenodd;stroke:#0000ff;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;marker-start:url(#TriangleInMfK);marker-mid:none;marker-end:url(#TriangleOutMew);stroke-miterlimit:4;stroke-dasharray:2.99999994, 2.99999994;stroke-dashoffset:0;stroke-opacity:1" />
+    <text
+       x="-230"
+       y="848.14026"
+       id="text13484"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="-230"
+         y="848.14026"
+         id="tspan13486"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Verdana;-inkscape-font-specification:Verdana">kL</tspan></text>
+    <text
+       x="-115"
+       y="813.14026"
+       id="text13488"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#ff0000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="-115"
+         y="813.14026"
+         id="tspan13490"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ff0000;font-family:Verdana;-inkscape-font-specification:Verdana">kL, <tspan
+   id="tspan13506"
+   style="fill:#000000">k&lt;1</tspan></tspan></text>
+    <text
+       x="-150"
+       y="908.14026"
+       id="text13492"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="-150"
+         y="908.14026"
+         id="tspan13494"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;font-family:Verdana;-inkscape-font-specification:Verdana">kL/2</tspan></text>
+    <text
+       x="-220"
+       y="953.14026"
+       id="text13496"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#0000ff;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="-220"
+         y="953.14026"
+         id="tspan13498"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#0000ff;font-family:Verdana;-inkscape-font-specification:Verdana">kL/2</tspan></text>
+    <text
+       x="-245"
+       y="1018.1403"
+       id="text13502"
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Verdana"><tspan
+         x="-245"
+         y="1018.1403"
+         id="tspan13504">k&lt;1 : not a restricted quadtree!</tspan></text>
+  </g>
+</svg>

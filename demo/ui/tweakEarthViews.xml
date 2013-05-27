@@ -1,0 +1,37 @@
+<!--
+ * Proland: a procedural landscape rendering library.
+ * Copyright (c) 2008-2011 INRIA
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+<!--
+ * Proland is distributed under a dual-license scheme.
+ * You can obtain a specific license from Inria: proland-licensing@inria.fr.
+-->
+<!--
+ * Authors: Eric Bruneton, Antoine Begault, Guillaume Piolat.
+-->
+<?xml version="1.0" ?>
+<tweakView name="tweakEarthViews" viewHandler="viewHandler">
+    <view name="Ocean" key="0" x0="-5.81654e-006" y0="3.11483e-006" theta="1.206" phi="1.076" d="62.6519" sx="0.126194" sy="-0.991967" sz="0.00872654"/>
+    <view name="Alps" key="1" x0="0.114011" y0="0.804118" theta="1.376" phi="3.93" d="10515" sx="0.553916" sy="-0.829001" sz="-0.0770375"/>
+    <view name="Kilimandjaro" key="2" x0="0.652867" y0="-0.0541086" theta="1.328" phi="7.626" d="21859.9" sx="0.624523" sy="-0.778142" sz="0.0668259"/>
+    <view name="Mt Rainier" key="3" x0="-2.12521" y0="0.818579" theta="1.434" phi="3.6" d="19827.6" sx="0.416644" sy="-0.873513" sz="-0.25176"/>
+    <view name="Himalayas" key="4" x0="1.51386" y0="0.484828" theta="1.33" phi="7.664" d="67143.2" sx="0.927635" sy="0.122125" sz="-0.352957"/>
+    <view name="Himalayas 2" key="5" x0="1.51648" y0="0.485278" theta="1.054" phi="6.946" d="126608" sx="0.992895" sy="-0.0260004" sz="-0.116121"/>
+    <view name="Ayers rock" key="6" x0="2.28688" y0="-0.442423" theta="1.428" phi="6.952" d="4369.2" sx="-0.852723" sy="0.425144" sz="0.303506"/>
+    <view name="Antartic" key="7" x0="-1.0784" y0="-1.12764" theta="1.514" phi="5.552" d="114838" sx="0.727858" sy="-0.610735" sz="0.311809"/>
+    <view name="Grand Canyon" key="8" x0="-1.98275" y0="0.62449" theta="1.414" phi="-2.624" d="10014.3" sx="-0.914676" sy="-0.108262" sz="-0.389418"/>
+    <view name="New Zealand" key="9" x0="-28.4457" y0="-0.758928" theta="1.45" phi="-1.848" d="16312.2" sx="-0.484798" sy="-0.865679" sz="-0.124784"/>
+</tweakView>
